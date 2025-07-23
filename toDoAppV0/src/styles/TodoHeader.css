@@ -1,0 +1,17 @@
+.todo-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  background: linear-gradient(135deg, #007cf0, #00dfd8);
+  color: transparent;
+  font-size: 3rem;
+  font-weight: bold;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  /* text-fill-color: none; */
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}

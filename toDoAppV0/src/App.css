@@ -1,0 +1,64 @@
+/* Global Styles */
+html {
+  font-size: clamp(14px, 2vw, 18px); /* Responsive base font size */
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center; /* Center content horizontally */
+  align-items: flex-start; /* You can change to 'center' to center vertically too */
+  min-height: 100vh;
+  box-sizing: border-box;
+  color: #111;
+}
+
+/* Main App Container */
+.app {
+  max-width: 600px;
+  width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Header */
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+}
+
+/* Form Elements Styling */
+input[type="text"],
+textarea,
+input[type="date"] {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #333;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+input[type="text"]:focus,
+textarea:focus,
+input[type="date"]:focus {
+  border-color: #4a90e2;
+}
+
+/* Responsive Padding for Mobile*/
+@media (max-width: 480px) {
+  .app {
+    padding: 1rem 0.75rem;
+  }
+}

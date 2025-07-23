@@ -1,0 +1,32 @@
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid #ccc;
+}
+
+.todo-item.completed .todo-item__title,
+.todo-item.completed .todo-item__desc {
+  text-decoration: line-through;
+  color: #777;
+}
+
+.todo-item__title {
+  font-weight: bold;
+  flex: 1;
+}
+
+.todo-item__desc {
+  flex: 2;
+}
+
+.todo-item__due {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.todo-item__input {
+  padding: 4px;
+  font-size: 1rem;
+}

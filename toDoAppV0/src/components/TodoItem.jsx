@@ -6,7 +6,7 @@ function sanitizeInput(str) {
   return str.replace(/[<>"'&]/g, "");
 }
 
-function TodoItem({ todo, updateTodo, deleteTodo }) {
+export function TodoItem({ todo, updateTodo, deleteTodo }) {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(todo.title);
   const [description, setDescription] = useState(todo.description);
@@ -41,9 +41,15 @@ function TodoItem({ todo, updateTodo, deleteTodo }) {
         </>
       ) : (
         <>
-          <span className="todo-item__title">{todo.title}</span>
-          <span className="todo-item__desc">{todo.description}</span>
-          <span className="todo-item__due">{todo.dueDate}</span>
+          <span className="todo-item__title" data-testid="todo-text">
+            {todo.text}
+          </span>
+          <span className="todo-item__desc" data-testid="todo-desc">
+            {todo.description}
+          </span>
+          <span className="todo-item__due" data-testid="todo-due">
+            {todo.dueDate}
+          </span>
           <button onClick={() => setIsEditing(true)}>Edit</button>
         </>
       )}
@@ -51,5 +57,3 @@ function TodoItem({ todo, updateTodo, deleteTodo }) {
     </li>
   );
 }
-
-export default TodoItem;

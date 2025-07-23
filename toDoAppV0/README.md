@@ -1,12 +1,35 @@
-# React + Vite
+# ToDo App - V0
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple React-based ToDo app built as a full stack web development exercise.  
+Provides a clean interface to add, edit, filter, and manage daily tasks.
 
-Currently, two official plugins are available:
+## Tooling & Technology
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **IDE:** Microsoft VS Code
+- **Build tool:** Vite
+- **Frameworks & Libraries:**
+  - react
+  - react-dom
+  - @vitejs/plugin-react
+- **Testing:**
+  - vitest
+  - @testing-library/react
+  - @testing-library/jest-dom
+- **Linting:** ESLint
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Add, edit, and delete todos
+- Mark todos as completed
+- Filter todos by All / Active / Completed
+- Input sanitization to prevent XSS attacks
+
+## Folder Structure
+
+- `/src/components` — React components
+- `/src/styles` — CSS styles
+- `/src/tests` — Unit tests
+
+---
+
+Feel free to customize or ask if you'd like me to generate a fuller README with badges, screenshots, or deployment instructions!

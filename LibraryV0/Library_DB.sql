@@ -3,8 +3,7 @@ USE Library_DB;
 CREATE TABLE Books (
   book_id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
-  author VARCHAR(255),
-  genre ENUM('Fiction', 'Fantasy', 'Non-fiction', 'Children', 'Classics', 'Biography', 'Foreign') NOT NULL,
+  authorname VARCHAR(255),
   isbn CHAR(17) UNIQUE,-- May have to format all ISBN to ISBN-13 at frontend
   published DATE,
   available BOOLEAN DEFAULT TRUE
@@ -28,3 +27,15 @@ CREATE TABLE Loans (
   FOREIGN KEY (book_id) REFERENCES Books(book_id),
   FOREIGN KEY (member_id) REFERENCES Members(member_id)
 );
+
+CREATE TABLE Locations (
+  location_id INT AUTO_INCREMENT PRIMARY KEY,
+  location_section VARCHAR(50),   -- e.g., "Fiction", "Reference", "Periodicals"
+  location_shelf INT,
+  location_row INT,
+  note TEXT              -- extra details eg. "Top shelf near entrance"
+);
+
+ALTER TABLE Books ADD location_id INT;
+ALTER TABLE Books
+  ADD FOREIGN KEY (location_id) REFERENCES Locations(location_id);

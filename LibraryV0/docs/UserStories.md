@@ -4,14 +4,15 @@
 
 > As a `Member`,
 > I want to search for a book by title, author, or ISBN,
-> so that I can find the book I'm interested in.
-> Acceptance Criteria:
+> so that I can find the book I’m interested in.
 
-- The search bar is visible on the main page.
-- I can enter keywords or an ISBN to search.
-- The system returns a list of matching books, showing title, author, and availability status.
-- If no results match, the system displays a “No books found” message.
-- Search results are sortable by title, author, or publication year.
+Acceptance Criteria:
+
+- Search bar is visible on the main page.
+- Keywords or ISBN can be entered.
+- Matching books are displayed with title, author, and availability.
+- “No books found” message appears if nothing matches.
+- Results are sortable by title, author, or year.
 
 ---
 
@@ -19,13 +20,14 @@
 
 > As a `Member`,
 > I want to view full details of a book,
-> so that I can learn more about it before deciding to borrow or reserve it.
-> Acceptance Criteria:
+> so that I can decide whether to borrow or reserve it.
 
-- Clicking on a search result opens the book details page.
-- The details page shows title, author, ISBN, synopsis, publication year, category, and availability.
-- If available, I can see the shelf location.
-- If on loan, I can see the expected return date and option to reserve.
+Acceptance Criteria:
+
+- Clicking a search result opens the book details page.
+- Details include title, author, ISBN, synopsis, publication year, category, and availability.
+- Shelf location is shown if available.
+- Expected return date is shown if on loan.
 
 ---
 
@@ -34,12 +36,13 @@
 > As a `Member`,
 > I want to borrow an available book,
 > so that I can read it.
-> Acceptance Criteria:
 
-- I can only borrow if my account is in good standing (no overdue books or unpaid fines).
-- Upon borrowing, the book status changes to `On Loan`.
-- The system sets a standard due date (e.g., 14 days from checkout).
-- An on-screen confirmation message appears with the due date and book details.
+Acceptance Criteria:
+
+- Can borrow only if account is in good standing (no overdue books, fines ≤ \$10).
+- Book status updates to `On Loan`.
+- Due date is automatically set (14 days from checkout).
+- On-screen confirmation shows due date and book details.
 
 ---
 
@@ -47,14 +50,15 @@
 
 > As a `Member`,
 > I want to renew a book I currently have on loan,
-> so that I can extend the borrowing period without returning it.
-> Acceptance Criteria:
+> so that I can extend the borrowing period.
 
-- The renewal option is available in “My Loans” for books not overdue and not reserved by others.
-- I can renew a book only once per loan.
-- Renewal extends the due date by the standard loan period.
-- The system sends a renewal confirmation notification.
-- The system prevents renewal if conditions are not met.
+Acceptance Criteria:
+
+- Renewal is available only for books not overdue and not reserved by others.
+- Max 2 renewals per book.
+- Due date extends by standard loan period.
+- Confirmation appears on screen.
+- Renewal prevented if conditions are not met.
 
 ---
 
@@ -62,43 +66,43 @@
 
 > As a `Member`,
 > I want to return a borrowed book,
-> so that my loan record is updated and the book becomes available for others.
-> Acceptance Criteria:
+> so that my loan record is updated and book becomes available.
 
-- Returns are processed by `Staff` at the circulation desk.
-- Staff scan the barcode or enter ISBN to mark the book returned.
-- Late returns automatically calculate overdue fees.
-- The system records the return date in loan history.
+Acceptance Criteria:
+
+- Return is processed via Librarian interface.
+- Late returns calculate overdue fees automatically.
+- Return date is recorded in loan history.
 
 ---
 
 ### 6. Reserve a Book
 
 > As a `Member`,
-> I want to reserve a book that is currently on loan,
-> so that I can borrow it when it is returned.
-> Acceptance Criteria:
+> I want to reserve a book currently on loan,
+> so that I can borrow it when available.
 
-- Reservation option is available only if book status is `On Loan`.
-- I can view my position in the reservation queue.
-- When available, the first person in queue is notified.
-- The book is held for 3 days before passing to the next person.
-- I cannot reserve a book I already have on loan.
-- The system prevents duplicate reservations for the same book by the same member.
+Acceptance Criteria:
+
+- Reservation available only if book status is `On Loan`.
+- Can see position in reservation queue.
+- Notification appears when book is ready for pickup.
+- Book held for 3 days before moving to next member.
+- Cannot reserve a book already borrowed by self.
 
 ---
 
 ### 7. Cancel a Reservation
 
 > As a `Member`,
-> I want to cancel my reservation for a book,
-> so that I can free the spot for other members.
-> Acceptance Criteria:
+> I want to cancel my reservation,
+> so that others can have access.
 
-- The “My Reservations” page lists all my active reservations.
-- Each reservation has a “Cancel” button.
-- Cancelled reservations remove me from the queue.
-- The next member in the queue moves up in position.
+Acceptance Criteria:
+
+- “My Reservations” page lists active reservations.
+- Each reservation has a cancel option.
+- Cancellation updates queue position for others.
 
 ---
 
@@ -107,178 +111,113 @@
 > As a `Member`,
 > I want to view my current and past loans,
 > so that I can track my borrowing history.
-> Acceptance Criteria:
 
-- “My Loans” page lists all books currently borrowed with due dates.
-- “Loan History” shows all returned books with borrow/return dates.
-- Overdue loans are flagged in red.
-- History is sorted by most recent first.
+Acceptance Criteria:
+
+- “My Loans” lists all borrowed books with due dates.
+- Returned books shown with borrow/return dates.
+- Overdue loans flagged in red.
+- Sorted by most recent first.
 
 ---
 
-### 9. View and Pay Fines
+### 9. View Fines
 
 > As a `Member`,
-> I want to view and pay my fines online,
-> so that I can clear my dues without visiting the library.
-> Acceptance Criteria:
+> I want to view my fines,
+> so that I can clear dues with the Librarian.
 
-- The “My Account” page lists outstanding fines and reasons.
-- Fines can be paid via supported payment methods.
-- Payment confirmation updates my account immediately.
-- Receipts appear as on-screen confirmation message.
+Acceptance Criteria:
+
+- Outstanding fines are visible on “My Account” page.
+- Fine reason and amount displayed.
+- Payment handled offline at library desk (MVP).
 
 ---
 
 ### 10. Receive Notifications
 
 > As a `Member`,
-> I want to know and keep track of due dates, overdue books, and reservation availability,
-> so that I can manage my loans on time.
-> Acceptance Criteria:
+> I want on-screen notifications for due dates, overdue books, and reservations,
+> so that I can manage loans on time.
 
-- Notifications will be on-screen.
-- Reminders appear 2 days before due date. (on Member Dashboard)
-- Overdue notifications persist until return. (on Member Dashboard)
-- Reservation availability when the book is ready for pickup. (on Member Dashboard)
+Acceptance Criteria:
 
----
-
-## Role: Staff
-
-### 11. Check Out a Book for a Member
-
-> As a `Staff` member,
-> I want to check out a book for a member,
-> so that they can borrow it without self-checkout.
-> Acceptance Criteria:
-
-- I can search for a member by ID.
-- I can scan the book barcode or enter ISBN.
-- The system enforces borrowing rules (good standing, loan limits).
-- Confirmation is provided for both staff and member.
-
----
-
-### 12. Process a Book Return
-
-> As a `Staff` member,
-> I want to process a book return,
-> so that the book becomes available for others.
-> Acceptance Criteria:
-
-- I can find the loan record by member ID or ISBN.
-- Late returns automatically calculate overdue fees.
-- Returned books update status to `Available`.
-- Return date is recorded in loan history.
-
----
-
-### 13. Mark a Book as Lost or Damaged
-
-> As a `Staff` member,
-> I want to mark a book as lost or damaged,
-> so that the system updates inventory and charges applicable fees.
-> Acceptance Criteria:
-
-- I can update a book’s status to `Lost` or `Damaged`.
-- Applicable fees are calculated based on replacement cost.
-- The system records reason and staff ID.
-- Lost/damaged books are excluded from borrowing and reservations.
+- Notifications appear on Member Dashboard.
+- Reminders show 2 days before due date.
+- Overdue notifications persist until book is returned.
+- Reservation-ready notifications appear when a book is available.
 
 ---
 
 ## Role: Librarian
 
-### 14. Add a New Book
+### 11. Add a New Book
 
 > As a `Librarian`,
 > I want to add a new book to the collection,
-> so that the library inventory stays up-to-date.
-> Acceptance Criteria:
+> so that inventory stays up-to-date.
 
-- I can enter title, author, ISBN, publication date, category, and location.
-- ISBN format is validated.
-- New book record defaults to status `Available`.
+Acceptance Criteria:
 
----
-
-### 15. Edit Book Details
-
-> As a `Librarian`,
-> I want to edit existing book details,
-> so that errors or outdated information can be corrected.
-> Acceptance Criteria:
-
-- I can search and select a book to edit.
-- Editable fields include title, author, category, location, and publication year.
-- Changes are saved and reflected immediately.
+- Can enter title, author, ISBN, publication year, category, material type, and location.
+- ISBN format validated.
+- New book defaults to `Available` status.
 
 ---
 
-### 16. Remove a Book
+### 12. Edit Book Details
 
 > As a `Librarian`,
-> I want to remove a book from the catalog,
-> so that unavailable or outdated items are not shown to members.
-> Acceptance Criteria:
+> I want to edit book details,
+> so that information remains accurate.
 
-- I can mark a book as `Archived` or `Removed`.
-- Removed books are excluded from search results.
-- Removal reason is stored in the system.
+Acceptance Criteria:
+
+- Search and select book to edit.
+- Editable fields: title, author, ISBN, category, publication year, material type, location.
+- Changes saved immediately.
 
 ---
 
-### 17. Manage Categories and Genres
+### 13. Remove a Book
 
 > As a `Librarian`,
-> I want to manage book categories and genres,
+> I want to remove a book,
+> so that outdated or unavailable items are not displayed.
+
+Acceptance Criteria:
+
+- Book marked as `Archived`.
+- Removed books excluded from search results.
+- Reason for removal stored internally.
+
+---
+
+### 14. Manage Categories and Material Types
+
+> As a `Librarian`,
+> I want to add, edit, or delete categories/material types,
 > so that books are organized for easier discovery.
-> Acceptance Criteria:
 
-- I can add, edit, or delete categories/genres.
-- Updated categories appear in search filters.
+Acceptance Criteria:
+
+- Updated categories/material types appear in search filters.
 - Deleting a category reassigns affected books to “Uncategorized.”
 
 ---
 
-## Role: Admin
+### 15. Manage Borrowing & Returns
 
-### 18. Manage User Roles
+> As a `Librarian`,
+> I want to process borrowing, returns, and reservations for members,
+> so that lending rules are enforced.
 
-> As an `Admin`,
-> I want to change a user’s role,
-> so that I can grant or revoke permissions.
-> Acceptance Criteria:
+Acceptance Criteria:
 
-- I can view all users and their roles.
-- I can change a role to `MEMBER`, `STAFF`, `LIBRARIAN`, or `ADMIN`.
-- My own admin role cannot be downgraded.
-- Changes are saved to the database.
-
----
-
-### 19. Deactivate or Reactivate User Accounts
-
-> As an `Admin`,
-> I want to deactivate or reactivate user accounts,
-> so that I can control system access.
-> Acceptance Criteria:
-
-- I can view account status (Active/Inactive).
-- Deactivated accounts cannot log in.
-- Reactivation restores previous role and permissions.
-- Actions are logged with admin ID.
+- Can process borrow and return for any member.
+- Overdue fines calculated automatically.
+- Renewals handled according to rules.
+- Reservation queues managed properly.
 
 ---
-
-### 20. View System Activity Logs
-
-> As an `Admin`,
-> I want to view system activity logs,
-> so that I can monitor and audit operations.
-> Acceptance Criteria:
-
-- Logs record actions like borrowing, returning, adding books, role changes.
-- Logs display date/time, user ID, and action performed.
-- Logs can be filtered by date range or action type.

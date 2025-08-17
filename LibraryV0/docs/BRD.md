@@ -39,8 +39,9 @@ This MVP follows the instructor’s 40-hour milestone plan; deployment is **not 
 - Online fine payments/payment gateway.
 - Advanced reporting/analytics; multi-branch libraries.
 - Audit-log UI.
+- Tags to different genres within the same category of books/publications.
 
-## 5. Business Rules (MVP — from instructor brief)
+## 5. Business Rules (MVP — from Trainer docs)
 
 ### Membership Rules
 
@@ -88,10 +89,10 @@ This MVP follows the instructor’s 40-hour milestone plan; deployment is **not 
 
 - All core features above implemented and functional with rules enforced (incl. membership validity, loan limits, renewals, fines).
 - Code follows standards; basic tests; proper error handling; no critical bugs.
-- Completed documentation (BRD, SRS, System Design, Test Plan & cases, User Manual).
+- Completed documentation (BRD, SRS, System Design, Test Plan & cases, User Manual, PPT).
 
 ## 10. Deliverables
 
 - Running application (local demo)
-- (Optional) GitHub repository
-- Documentation: BRD, SRS, System Design (a
+- GitHub repository
+- Documentation: As above

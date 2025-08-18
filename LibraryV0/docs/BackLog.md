@@ -7,6 +7,12 @@
    - RBAC support via `roles` table.
    - Timestamp tracking (`created_at`, `updated_at`) for all mutable tables.
    - Reservation queue (FIFO) and 3-day hold logic accounted for in design.
+2. **Project Setup**
+   - Scaffolded Spring Boot project with RESTful APIs.
+     - Entity, enums, converters, repositories done. (Pending Services, Controllers and Auth for MVP)
+   - Set up React project with React Router for navigation.
+     - Placemarker files and templates added
+   - Set up MySQL database completed.
 
 ---
 
@@ -32,10 +38,10 @@
 
 4. **Book Management (Librarian)**
 
-   - CRUD operations for books (Novels, Magazines, etc.).
-   - Validation for required fields.
+   - CRUD operations for books.
+   - Add search and filter functionality for books (e.g., by title, author, category).
    - Status management: `Available`, `Borrowed`, `Reserved`.
-   - Category handling; optional future ENUM support.
+   - Category handling: ENUM support.
 
 5. **Loan Management (Member)**
    - Borrow book with eligibility checks:

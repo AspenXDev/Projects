@@ -4,14 +4,15 @@
 CREATE DATABASE Library_DB;
 USE Library_DB;
 
--- Roles: Only two roles as per BRD/SRS (Member, Librarian)
+-- Roles: Only two roles as per BRD/SRS (Members, Librarians)
 CREATE TABLE roles (
     role_id INT AUTO_INCREMENT PRIMARY KEY,
     role_name VARCHAR(50) UNIQUE NOT NULL
 );
 
--- Preload rolesrolesrole_idrole_name
-INSERT INTO roles (role_name) VALUES ('Member'), ('Librarian');
+-- Preload role_name
+INSERT INTO roles (role_id, role_name) VALUES (1, 'Members');
+INSERT INTO roles (role_id, role_name) VALUES (2, 'Librarians');
 
 -- Users: System users linked to roles and for centralization of authentication (DRY and RBAC)
 CREATE TABLE users (

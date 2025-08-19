@@ -61,7 +61,7 @@ public class Book {
     private Set<Reservation> reservations;
 
     public enum BookStatus { Available, Borrowed, Reserved }
-
+    
     // Getters and Setters
 	public Integer getBookId() {
 		return bookId;
@@ -190,8 +190,4 @@ public class Book {
 	public void setReservations(Set<Reservation> reservations) {
 		this.reservations = reservations;
 	}
-
-
-
-
 }

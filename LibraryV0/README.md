@@ -170,7 +170,7 @@ Source code, versioned and documented.
 
 ## Resources & Methodology
 
-- Solo development (Victor): GitHub, Postman, MySQL Workbench, IntelliJ/VS Code.
+- Solo development (Victor): GitHub, Postman, MySQL Workbench, Eclipse/VS Code.
 - Hybrid approach: upfront design (DB, API), then iterative feature development and testing aligned to the milestones.
 - Testing: JUnit (backend), Jest/RTL (frontend), Postman collections for endpoints.
 

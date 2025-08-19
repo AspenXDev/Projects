@@ -1,29 +1,51 @@
-# Architecture
+# Architecture-Notes
 
-**Backend**
+## Backend
 
-- Runs on port 8080
-- Spring Boot properties:
-  - server.port=8080
-  - spring.datasource.url=jdbc:mysql://localhost:3306/librarydb
+- **Framework & Port:** Spring Boot, running on port `8080`.
+- **Database:** MySQL `Library_DB`. Entities map directly to tables: `users`, `members`, `librarians`, `books`, `loans`, `reservations`, `fines`.
+- **Security & Auth:**
 
-**Frontend**
+  - Stateless JWT-based authentication (`HS256`).
+  - All endpoints require valid JWT except `/auth/**`.
+  - JWT payload contains:
 
-- React app, runs on port 5173 (default Vite)
-- Communicates with backend via REST APIs
+    ```json
+    {
+      "userId": 123,
+      "username": "alice",
+      "role": "Members",
+      "exp": 1690000000
+    }
+    ```
 
-## RBAC (Role-Based Access Control)
+  - Roles dynamically fetched from `roles` table for RBAC enforcement.
 
-- Each user has a `roleId` linked to `roles` table
-- Roles are not hardcoded, making it easy to add/change roles in future versions
+- **RBAC Enforcement:**
 
-## Authentication
+  - Backend: `@PreAuthorize("hasRole('Librarians')")` for Librarian-only endpoints.
+  - Member-specific endpoints enforce ownership:
 
-- Uses **HS256 symmetric JWT tokens**
-- Flow:
-  1. `JwtUtil` validates signature & expiration
-  2. `JwtAuthenticationFilter` sets Spring Security context if token is valid
-  3. Rejects request if token is invalid
-  4. Extracts username from token for authorization
-- Secret key (jwt.secret) is long and difficult to guess:
-  `jwt.secret=ThisHereIsMySuperLongSecretKeyForJWTsUsedInMyCapstoneProject!999`
+    ```java
+    @PreAuthorize("hasRole('Members')
+    ```
+
+  - Security filter chain integrated with `JwtAuthenticationFilter` that validates token, sets Spring Security context, and loads roles.
+
+- **JWT Flow:**
+
+  1. Client sends JWT in `Authorization: Bearer <token>`.
+  2. `JwtAuthenticationFilter` validates token.
+  3. Spring Security context populated with user details and roles.
+  4. `@PreAuthorize` annotations enforce access based on role and ownership.
+
+## Frontend
+
+- **Framework & Port:** ReactJS (Vite), default port `5173`.
+- **PrivateRoute & Conditional Rendering:**
+
+  - Members can only see their own profiles, loans, reservations, and fines.
+  - Librarians access all management dashboards and CRUD features.
+  - Components verify role before rendering; otherwise, redirect to login or 403 page.
+
+---

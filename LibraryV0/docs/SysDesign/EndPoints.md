@@ -1,88 +1,153 @@
-For All APIs in the WBS, all CRUD operations shall be detailed here.
+# EndPoints
 
-# 2.1 Auth API
+## 1. Legend
 
-User login with email/password
-Issue and verify JWT
-Register new users (members/staff/librarian/admin)
-Password reset flow
-Role management (Member, Staff, Admin)
+| Term              | Meaning                                                                                      |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| **Members (own)** | Member role can only access their own records (ownership enforced via `member.user.userId`). |
+| **Librarians**    | Full access to all relevant entities.                                                        |
+| **Authenticated** | Any logged-in user with valid JWT.                                                           |
 
-| Method | Endpoint               | Description                 |
-| ------ | ---------------------- | --------------------------- |
-| POST   | `/auth/register`       | Register a new user         |
-| POST   | `/auth/login`          | Login and get token         |
-| POST   | `/auth/logout`         | Logout (token invalidation) |
-| POST   | `/auth/refresh`        | Refresh auth token          |
-| POST   | `/auth/reset-password` | Request password reset      |
+**Frontend Guarding:**
 
-# 2.2 Member API
+- Use `PrivateRoute` components and conditional rendering to restrict access based on role.
+- Members can see their own profile pages and dashboards.
+- Librarians can access all management/admin panels.
 
-View and update member info (name, email, phone, address)
-View loan history and current loans
-Manage reservations, fines, and notifications
-| Method | Endpoint | Description |
-| ------ | ----------------------------------- | ------------------------- |
-| GET | `/members/{member_id}` | Get member profile |
-| PUT | `/members/{member_id}` | Update member info |
-| GET | `/members/{member_id}/loans` | Get member’s loans |
-| GET | `/members/{member_id}/reservations` | Get member’s reservations |
+**Backend RBAC:**
 
-# 2.3 Book API
+- Use `@PreAuthorize("hasRole('Librarians')")` for Librarian-only endpoints.
+- Use `@PreAuthorize("hasRole('Members') and @authService.isOwner(#memberId)")` for member-own endpoints.
 
-Add/edit/delete books (staff/admin only)
-Search and list books by title, author, genre, availability
-View detailed book info
-Track physical copies if needed (change location etc)
+---
 
-| Method | Endpoint           | Description          |
-| ------ | ------------------ | -------------------- |
-| GET    | `/books`           | Search or list books |
-| GET    | `/books/{book_id}` | Get book details     |
-| POST   | `/books`           | Add a new book       |
-| PUT    | `/books/{book_id}` | Update book info     |
-| DELETE | `/books/{book_id}` | Remove a book        |
+## 2. Auth API
 
-# 2.4 Loan Management API
+| Method | Endpoint               | Role/Access   | Description                                 |
+| ------ | ---------------------- | ------------- | ------------------------------------------- |
+| POST   | `/auth/register`       | Public        | Register new user (Member or Librarian)     |
+| POST   | `/auth/login`          | Public        | Login and obtain JWT                        |
+| POST   | `/auth/logout`         | Authenticated | Invalidate JWT (optional for stateless JWT) |
+| POST   | `/auth/refresh`        | Authenticated | Refresh JWT token                           |
+| POST   | `/auth/reset-password` | Public        | Request password reset link/email           |
 
-Create new loans when members borrow books
-Update loan records when books are returned or renewed
-Retrieve loan history and status for members and staff
-Identify overdue loans and calculate late fees
-Support cancellation or extension of loans (renewals)
-Possibly integrate with notifications for reminders
+**Notes:**
 
-| HTTP Method | Endpoint                  | Description                             |
-| ----------- | ------------------------- | --------------------------------------- |
-| POST        | `/loans`                  | Create a new loan (borrow book)         |
-| GET         | `/loans/{loan_id}`        | Get details of a specific loan          |
-| GET         | `/loans?member_id=...`    | List loans for a particular member      |
-| GET         | `/loans?status=overdue`   | List overdue loans                      |
-| PUT / PATCH | `/loans/{loan_id}/return` | Mark a loan as returned                 |
-| PUT / PATCH | `/loans/{loan_id}/renew`  | Renew or extend the due date            |
-| DELETE      | `/loans/{loan_id}`        | Cancel a loan (rare case but possible?) |
+- JWT payload includes `role_name` for RBAC enforcement.
 
-# 2.5 Genre & Classification API
+---
 
-CRUD genres or categories
-Assign books to genres
-Possibly manage sub-genres or classification schemes (e.g., Dewey Decimal)
-| Method | Endpoint | Description |
-| ------ | -------------------- | ----------------- |
-| GET | `/genres` | List all genres |
-| GET | `/genres/{genre_id}` | Get genre details |
-| POST | `/genres` | Add a new genre |
-| PUT | `/genres/{genre_id}` | Update genre info |
-| DELETE | `/genres/{genre_id}` | Delete a genre |
+## 3. Member API
 
-# 2.6 Notifications API
+| Method | Endpoint                            | Role/Access               | Description                  |
+| ------ | ----------------------------------- | ------------------------- | ---------------------------- |
+| GET    | `/members/{member_id}`              | Members (own), Librarians | Get member profile           |
+| PUT    | `/members/{member_id}`              | Members (own), Librarians | Update member info           |
+| GET    | `/members/{member_id}/loans`        | Members (own), Librarians | List loans for member        |
+| GET    | `/members/{member_id}/reservations` | Members (own), Librarians | List reservations for member |
+| GET    | `/members/{member_id}/fines`        | Members (own), Librarians | List fines for member        |
 
-| Column          | Type          | Description                 |
-| --------------- | ------------- | --------------------------- |
-| notification_id | INT PK        | Unique notification ID      |
-| user_id         | INT FK        | Recipient user              |
-| message         | TEXT          | Notification content        |
-| type            | VARCHAR(50)   | Reminder, alert, info, etc. |
-| status          | VARCHAR(20)   | Sent, read, dismissed       |
-| created_at      | DATETIME      | When created                |
-| sent_at         | DATETIME NULL | When sent                   |
+**Notes:**
+
+- Ownership checks prevent members from accessing other members’ data.
+- Librarians bypass ownership checks.
+
+---
+
+## 4. Book API
+
+| Method | Endpoint           | Role/Access   | Description                                                    |
+| ------ | ------------------ | ------------- | -------------------------------------------------------------- |
+| GET    | `/books`           | Authenticated | List/search books (`?status=Available`, `?title=...`)          |
+| GET    | `/books/{book_id}` | Authenticated | View book details including `location_section`, `shelf`, `row` |
+| POST   | `/books`           | Librarians    | Add new book including physical location                       |
+| PUT    | `/books/{book_id}` | Librarians    | Update book details & location                                 |
+| DELETE | `/books/{book_id}` | Librarians    | Remove a book                                                  |
+
+**Notes:**
+
+- Members can view all book info including physical placement.
+- Librarians can CRUD books and manage physical location.
+
+---
+
+## 5. Loan Management API
+
+| Method | Endpoint                       | Role/Access               | Description                                                                                      |
+| ------ | ------------------------------ | ------------------------- | ------------------------------------------------------------------------------------------------ |
+| POST   | `/loans`                       | Members, Librarians       | Borrow books (Members link automatically to their own ID). Librarians can create for any member. |
+| GET    | `/loans/{loan_id}`             | Members (own), Librarians | Get loan details                                                                                 |
+| GET    | `/loans?member_id={member_id}` | Members (own), Librarians | List loans for a member (members only their own)                                                 |
+| GET    | `/loans?status=overdue`        | Librarians                | List all overdue loans                                                                           |
+| PUT    | `/loans/{loan_id}/return`      | Members (own), Librarians | Mark loan returned                                                                               |
+| PUT    | `/loans/{loan_id}/renew`       | Members (own), Librarians | Renew loan                                                                                       |
+| DELETE | `/loans/{loan_id}`             | Librarians                | Cancel a loan                                                                                    |
+
+**@PreAuthorize example:**
+
+```java
+// Members can only operate on their own loans
+@PreAuthorize("hasRole('Members')
+```
+
+---
+
+## 6. Reservation API
+
+| Method | Endpoint                                | Role/Access               | Description                                      |
+| ------ | --------------------------------------- | ------------------------- | ------------------------------------------------ |
+| POST   | `/reservations`                         | Members, Librarians       | Create reservation (Members only for themselves) |
+| GET    | `/reservations/{reservation_id}`        | Members (own), Librarians | View reservation                                 |
+| GET    | `/reservations?member_id={member_id}`   | Members (own), Librarians | List reservations for a member                   |
+| PUT    | `/reservations/{reservation_id}/cancel` | Members (own), Librarians | Cancel reservation                               |
+
+---
+
+## 7. Fines API
+
+| Method | Endpoint                       | Role/Access               | Description           |
+| ------ | ------------------------------ | ------------------------- | --------------------- |
+| GET    | `/fines/{fine_id}`             | Members (own), Librarians | Get fine details      |
+| GET    | `/fines?member_id={member_id}` | Members (own), Librarians | List fines for member |
+
+---
+
+## 8. Role Enforcement Matrix (Visual)
+
+| Entity       | Members (own)                | Librarians              |
+| ------------ | ---------------------------- | ----------------------- |
+| Profile      | view/edit own                | view/edit any           |
+| Books        | view                         | CRUD including location |
+| Loans        | view/create/return/renew own | full CRUD               |
+| Reservations | view/create/cancel own       | full CRUD               |
+| Fines        | view own                     | view all                |
+| Auth         | login/register/reset own     | manage if needed        |
+
+---
+
+## 9. Notes for Frontend & Backend
+
+**Frontend**
+
+- Use `PrivateRoute` to hide unauthorized pages.
+- Members see only their own dashboards.
+- Librarians see global management dashboards.
+
+**Backend**
+
+- Use `@PreAuthorize` for role checks.
+- All endpoints require JWT except `/auth/**`.
+- JWT payload contains `username` and `role_name`.
+
+---
+
+## 10. Role Enforcement Matrix
+
+| Entity / Action | Members (own)                      | Librarians               |
+| --------------- | ---------------------------------- | ------------------------ |
+| Profile         | view / edit own                    | view / edit any          |
+| Books           | view                               | create / update / delete |
+| Loans           | view / borrow / return / renew own | full CRUD                |
+| Reservations    | view / create / cancel own         | full CRUD                |
+| Fines           | view own                           | full CRUD                |
+| Auth            | login / register / reset own       | full CRUD                |

@@ -12,10 +12,11 @@
 
     ```json
     {
-      "userId": 123,
-      "username": "alice",
-      "role": "Members",
-      "exp": 1690000000
+      "sub": "john_doe", // username from users.username
+      "role": "MEMBER", // role_name mapped from roles table
+      "userId": 42, // user_id from users table
+      "iat": 1692568800, // issued at timestamp (seconds since epoch)
+      "exp": 1692576000 // expiration timestamp
     }
     ```
 

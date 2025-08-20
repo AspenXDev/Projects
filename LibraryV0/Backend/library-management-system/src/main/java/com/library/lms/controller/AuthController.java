@@ -32,13 +32,13 @@ public class AuthController {   // <-- class starts here
         // authenticate user
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        authRequest.getUsername(),
-                        authRequest.getPassword()
+                        authRequest.Username(),
+                        authRequest.Password()
                 )
         );
 
         // load full UserDetails
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(authRequest.getUsername());
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(authRequest.Username());
 
         // generate JWT token using UserDetails
         final String token = jwtUtil.generateToken(userDetails);

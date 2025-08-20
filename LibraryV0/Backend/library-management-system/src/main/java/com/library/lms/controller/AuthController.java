@@ -1,69 +1,48 @@
-package com.library.lms.auth;
+package com.library.lms.controller;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.library.lms.auth.CustomUserDetailsService;
+import com.library.lms.auth.JwtUtil;
+import com.library.lms.dto.AuthRequest;
+import com.library.lms.dto.AuthResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthController {
+public class AuthController {   // <-- class starts here
 
     @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private CustomUserDetailsService customUserDetailsService;
 
     @Autowired
     private JwtUtil jwtUtil;
 
-    // --------------------
-    // Login endpoint
-    // --------------------
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
-        try {
-            // Authenticate user
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            authRequest.getUsername(),
-                            authRequest.getPassword()
-                    )
-            );
-        } catch (BadCredentialsException ex) {
-            return ResponseEntity.status(401).body("Invalid username or password");
-        }
+    public AuthResponse login(@RequestBody AuthRequest authRequest) {
+        // authenticate user
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        authRequest.getUsername(),
+                        authRequest.getPassword()
+                )
+        );
 
-        // Load user details
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
+        // load full UserDetails
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(authRequest.getUsername());
 
-        // Generate JWT token
-        final String jwt = jwtUtil.generateToken(userDetails);
+        // generate JWT token using UserDetails
+        final String token = jwtUtil.generateToken(userDetails);
 
-        // Return token
-        return ResponseEntity.ok(new AuthResponse(jwt));
+        return new AuthResponse(token);
     }
-
-    // Optional test endpoint to verify authentication
-    @GetMapping("/test")
-    public ResponseEntity<?> testAuth() {
-        return ResponseEntity.ok("You are authenticated!");
-    }
-
-    // --------------------
-    // Request / Response DTOs
-    // --------------------
-    @Data
-    public static class AuthRequest {
-        private String username;
-        private String password;
-    }
-
-    @Data
-    @AllArgsConst
+}

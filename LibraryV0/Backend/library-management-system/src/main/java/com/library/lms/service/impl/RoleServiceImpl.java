@@ -1,6 +1,6 @@
 package com.library.lms.service.impl;
 
-import com.library.lms.model.Role;
+import com.library.lms.model.enums.Role;
 import com.library.lms.repository.RoleRepository;
 import com.library.lms.service.RoleService;
 import jakarta.transaction.Transactional;

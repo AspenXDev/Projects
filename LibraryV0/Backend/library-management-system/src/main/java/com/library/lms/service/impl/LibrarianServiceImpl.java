@@ -1,13 +1,14 @@
 package com.library.lms.service.impl;
 
 import com.library.lms.model.Librarian;
-import com.library.lms.model.User;
+import com.library.lms.dto.LibrarianDTO;
 import com.library.lms.repository.LibrarianRepository;
+import com.library.lms.repository.UserRepository;
 import com.library.lms.service.LibrarianService;
-import com.library.lms.service.UserService;
-import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Service;
+import com.library.lms.mapper.MapperFactory;
 
+import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -15,27 +16,33 @@ import java.util.List;
 public class LibrarianServiceImpl implements LibrarianService {
 
     private final LibrarianRepository librarianRepository;
-    private final UserService userService; // For handling User relationship
+    private final UserRepository userRepository;
 
-    public LibrarianServiceImpl(LibrarianRepository librarianRepository, UserService userService) {
+    public LibrarianServiceImpl(LibrarianRepository librarianRepository, UserRepository userRepository) {
         this.librarianRepository = librarianRepository;
-        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public Librarian createLibrarian(Librarian librarian) {
-        // Ensure the linked User exists
-        Integer userId = librarian.getUser().getUserId();
-        User user = userService.getUserById(userId);
-        librarian.setUser(user);
-
+    public Librarian createLibrarian(LibrarianDTO librarianDTO) {
+        Librarian librarian = MapperFactory.toLibrarian(librarianDTO);
+        userRepository.save(librarian.getUser());
         return librarianRepository.save(librarian);
     }
 
     @Override
-    public Librarian getLibrarianById(Integer librarianId) {
-        return librarianRepository.findById(librarianId)
-                .orElseThrow(() -> new RuntimeException("Librarian not found with ID: " + librarianId));
+    public Librarian updateLibrarian(Integer id, LibrarianDTO librarianDTO) {
+        Librarian existing = librarianRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Librarian not found"));
+        Librarian updated = MapperFactory.toLibrarian(librarianDTO);
+        updated.setLibrarianId(existing.getLibrarianId());
+        updated.setUser(existing.getUser()); // preserve user entity
+        return librarianRepository.save(updated);
+    }
+
+    @Override
+    public void deleteLibrarian(Integer id) {
+        librarianRepository.deleteById(id);
     }
 
     @Override
@@ -44,24 +51,8 @@ public class LibrarianServiceImpl implements LibrarianService {
     }
 
     @Override
-    public Librarian updateLibrarian(Integer librarianId, Librarian librarianDetails) {
-        Librarian librarian = getLibrarianById(librarianId);
-
-        librarian.setFullName(librarianDetails.getFullName());
-
-        // Update linked User if provided
-        if (librarianDetails.getUser() != null) {
-            Integer userId = librarianDetails.getUser().getUserId();
-            User user = userService.getUserById(userId);
-            librarian.setUser(user);
-        }
-
-        return librarianRepository.save(librarian);
-    }
-
-    @Override
-    public void deleteLibrarian(Integer librarianId) {
-        Librarian librarian = getLibrarianById(librarianId);
-        librarianRepository.delete(librarian);
+    public Librarian getLibrarianById(Integer id) {
+        return librarianRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Librarian not found"));
     }
 }

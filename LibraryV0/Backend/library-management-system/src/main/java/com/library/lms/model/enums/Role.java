@@ -1,4 +1,4 @@
-package com.library.lms.model;
+package com.library.lms.model.enums;
 
 import jakarta.persistence.*;
 

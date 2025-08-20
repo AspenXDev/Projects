@@ -1,3 +1,4 @@
+---
 # EndPoints
 
 ## 1. Legend
@@ -56,13 +57,13 @@
 
 ## 4. Book API
 
-| Method | Endpoint           | Role/Access   | Description                                                    |
-| ------ | ------------------ | ------------- | -------------------------------------------------------------- |
-| GET    | `/books`           | Authenticated | List/search books (`?status=Available`, `?title=...`)          |
-| GET    | `/books/{book_id}` | Authenticated | View book details including `location_section`, `shelf`, `row` |
-| POST   | `/books`           | Librarians    | Add new book including physical location                       |
-| PUT    | `/books/{book_id}` | Librarians    | Update book details & location                                 |
-| DELETE | `/books/{book_id}` | Librarians    | Remove a book                                                  |
+| Method | Endpoint           | Role/Access | Description                                                    |
+| ------ | ------------------ | ----------- | -------------------------------------------------------------- |
+| GET    | `/books`           | Public      | List/search books (`?status=Available`, `?title=...`)          |
+| GET    | `/books/{book_id}` | Public      | View book details including `location_section`, `shelf`, `row` |
+| POST   | `/books`           | Librarians  | Add new book including physical location                       |
+| PUT    | `/books/{book_id}` | Librarians  | Update book details & location                                 |
+| DELETE | `/books/{book_id}` | Librarians  | Remove a book                                                  |
 
 **Notes:**
 
@@ -87,7 +88,7 @@
 
 ```java
 // Members can only operate on their own loans
-@PreAuthorize("hasRole('Members')
+@PreAuthorize("hasRole('Members') and @authService.isOwner(#loanId)")
 ```
 
 ---
@@ -151,3 +152,5 @@
 | Reservations    | view / create / cancel own         | full CRUD                |
 | Fines           | view own                           | full CRUD                |
 | Auth            | login / register / reset own       | full CRUD                |
+
+---

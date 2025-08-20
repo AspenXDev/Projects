@@ -1,13 +1,14 @@
 package com.library.lms.service.impl;
 
 import com.library.lms.model.Member;
-import com.library.lms.model.User;
+import com.library.lms.dto.MemberDTO;
 import com.library.lms.repository.MemberRepository;
+import com.library.lms.repository.UserRepository;
 import com.library.lms.service.MemberService;
-import com.library.lms.service.UserService;
-import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Service;
+import com.library.lms.mapper.MapperFactory;
 
+import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -15,27 +16,33 @@ import java.util.List;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
-    public MemberServiceImpl(MemberRepository memberRepository, UserService userService) {
+    public MemberServiceImpl(MemberRepository memberRepository, UserRepository userRepository) {
         this.memberRepository = memberRepository;
-        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public Member createMember(Member member) {
-        // Ensure the linked User exists
-        Integer userId = member.getUser().getUserId();
-        User user = userService.getUserById(userId);
-        member.setUser(user);
-
+    public Member createMember(MemberDTO memberDTO) {
+        Member member = MapperFactory.toMember(memberDTO);
+        userRepository.save(member.getUser());
         return memberRepository.save(member);
     }
 
     @Override
-    public Member getMemberById(Integer memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("Member not found with ID: " + memberId));
+    public Member updateMember(Integer id, MemberDTO memberDTO) {
+        Member existing = memberRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Member not found"));
+        Member updated = MapperFactory.toMember(memberDTO);
+        updated.setMemberId(existing.getMemberId());
+        updated.setUser(existing.getUser()); // preserve user entity
+        return memberRepository.save(updated);
+    }
+
+    @Override
+    public void deleteMember(Integer id) {
+        memberRepository.deleteById(id);
     }
 
     @Override
@@ -44,27 +51,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member updateMember(Integer memberId, Member memberDetails) {
-        Member member = getMemberById(memberId);
-
-        member.setFullName(memberDetails.getFullName());
-        member.setRegistrationDate(memberDetails.getRegistrationDate());
-        member.setMembershipValidUntil(memberDetails.getMembershipValidUntil());
-        member.setMembershipStatus(memberDetails.getMembershipStatus());
-
-        // Update linked User if provided
-        if (memberDetails.getUser() != null) {
-            Integer userId = memberDetails.getUser().getUserId();
-            User user = userService.getUserById(userId);
-            member.setUser(user);
-        }
-
-        return memberRepository.save(member);
-    }
-
-    @Override
-    public void deleteMember(Integer memberId) {
-        Member member = getMemberById(memberId);
-        memberRepository.delete(member);
+    public Member getMemberById(Integer id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Member not found"));
     }
 }

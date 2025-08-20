@@ -1,6 +1,6 @@
-# SDA-Notes
+# **SDA-Notes**
 
-## Database Design
+## **Database Design**
 
 - **Roles & Users:**
 
@@ -19,18 +19,33 @@
   - `loans.status` (`Active`, `Returned`)
   - `reservations.status` (`Waiting`, `On Hold`, `Collected`, `Cancelled`)
 
-## Backend Design
+## **Backend Design**
 
-- **Entities & DTOs:**
+### **Entities & DTOs:**
 
-  - DTOs prevent exposing lazy-loaded relationships (`Member`, `Librarian`, `Book`) directly.
-  - Only required fields (e.g., book location: `location_section`, `location_shelf`, `location_row`) returned to Members.
+- DTOs prevent exposing lazy-loaded relationships (`Member`, `Librarian`, `Book`) directly.
+- Only required fields (e.g., book location: `location_section`, `location_shelf`, `location_row`) returned to Members.
 
-- **CustomUserDetailsService:**
+### **Mappers:**
 
-  - Maps `users.password_hash` to Spring Security password.
-  - Maps `users.role_id` to `role_name`.
-  - Checks `is_active` for account status.
+Mappers encapsulate the conversion logic, ensuring that domain objects are safely and consistently mapped to data transfer objects for API communication, and vice versa.
+
+- Entity ↔ DTO is the whole point (eg. `Member`↔`MemberDTO`)
+- Entity → DTO: when exposing data in API response (e.g. returning UserDTP from User entity).
+- DTO → Entity: when accepting data in a request body to turn it into a JPA entity (using toEntity())
+- While User entity has roles, password, etc.
+- UserDTO only has id, username, roles (simplified, no password).
+
+### **Mapper Factory:**
+
+- Centralizes mapping logic, providing static methods like toMember(MemberDTO) and toLibrarian(LibrarianDTO)
+- This approach avoids repetitive mapping code, reduces human error, and improves maintainability. It also enforces security best practices—protecting your data integrity and decouple the database from the API layer.
+
+### **CustomUserDetailsService:**
+
+- Maps `users.password_hash` to Spring Security password.
+- Maps `users.role_id` to `role_name`.
+- Checks `is_active` for account status.
 
 - **JwtAuthenticationFilter:**
 
@@ -56,7 +71,7 @@
 ## Security & Passwords
 
 - **Password Hashing:** `BCryptPasswordEncoder` compatible with `users.password_hash`.
-- **Token Expiration:** Configurable via `application.properties` (e.g., 1 hour).
+- **Token Expiration:** Configurable via `application.properties` (1 hour in ms set now).
 - **Token Refresh:** `/auth/refresh` endpoint to issue new token before expiration.
 
 ## Example Endpoint Mapping

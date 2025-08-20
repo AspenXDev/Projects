@@ -3,6 +3,8 @@ package com.library.lms.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import com.library.lms.model.enums.Role;
+
 @Entity
 @Table(name = "users")
 public class User {

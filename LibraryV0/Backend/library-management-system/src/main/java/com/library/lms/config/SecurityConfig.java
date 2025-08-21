@@ -27,7 +27,10 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()
+                // Always public
+            		.requestMatchers("/auth/**").permitAll()   // login endpoints
+            		.requestMatchers("/books/**").permitAll()  // books too
+                // All other endpoints require authentication
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -46,7 +49,6 @@ public class SecurityConfig {
         return authConfig.getAuthenticationManager();
     }
 }
-
 
 
 

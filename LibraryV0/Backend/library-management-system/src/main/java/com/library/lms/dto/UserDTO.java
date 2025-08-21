@@ -1,3 +1,5 @@
+// Deprecated. Normal entity used now.
+
 package com.library.lms.dto;
 
 public record UserDTO(

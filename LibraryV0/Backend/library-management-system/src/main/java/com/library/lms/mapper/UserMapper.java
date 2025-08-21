@@ -1,3 +1,5 @@
+// Deprecated. Normal entity used now.
+
 package com.library.lms.mapper;
 
 import com.library.lms.dto.UserDTO;

@@ -1,7 +1,8 @@
 package com.library.lms.service;
 
-import com.library.lms.model.Fine;
 import java.util.List;
+
+import com.library.lms.model.Fine;
 
 public interface FineService {
     Fine createFine(Fine fine);

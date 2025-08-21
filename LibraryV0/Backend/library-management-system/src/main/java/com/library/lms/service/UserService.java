@@ -1,7 +1,8 @@
 package com.library.lms.service;
 
-import com.library.lms.model.User;
 import java.util.List;
+
+import com.library.lms.model.User;
 
 public interface UserService {
     User createUser(User user);

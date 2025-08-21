@@ -2,7 +2,7 @@ package com.library.lms.service;
 
 import java.util.List;
 
-import com.library.lms.model.enums.Role;
+import com.library.lms.model.Role;
 
 public interface RoleService {
     Role createRole(Role role);

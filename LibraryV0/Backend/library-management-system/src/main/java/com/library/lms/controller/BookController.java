@@ -1,12 +1,12 @@
 package com.library.lms.controller;
 
-import com.library.lms.model.Book;
-
-import com.library.lms.service.BookService;
+import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import com.library.lms.model.Book;
+import com.library.lms.model.enums.BookStatus;
+import com.library.lms.service.BookService;
 
 @RestController
 @RequestMapping("/books")
@@ -18,6 +18,9 @@ public class BookController {
         this.bookService = bookService;
     }
 
+    // ======================
+    // CRUD
+    // ======================
     @GetMapping
     public List<Book> getAllBooks() {
         return bookService.getAllBooks();
@@ -43,9 +46,21 @@ public class BookController {
         bookService.deleteBook(id);
     }
 
+    // ======================
     // Convenience endpoints
+    // ======================
     @GetMapping("/available")
     public List<Book> getAvailableBooks() {
-        return bookService.getBooksByStatus("Available");
+        return bookService.getBooksByStatus(BookStatus.Available);
+    }
+
+    @GetMapping("/borrowed")
+    public List<Book> getBorrowedBooks() {
+        return bookService.getBooksByStatus(BookStatus.Borrowed);
+    }
+
+    @GetMapping("/reserved")
+    public List<Book> getReservedBooks() {
+        return bookService.getBooksByStatus(BookStatus.Reserved);
     }
 }

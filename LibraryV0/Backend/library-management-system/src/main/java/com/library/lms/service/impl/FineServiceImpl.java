@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.library.lms.exception.FineNotFoundException;
 import com.library.lms.model.Fine;
 import com.library.lms.model.Loan;
 import com.library.lms.repository.FineRepository;
@@ -27,9 +28,20 @@ public class FineServiceImpl implements FineService {
     @Override
     public Fine createFine(Fine fine) {
         // Ensure linked Loan exists
-        Integer loanId = fine.getLoan().getLoanId();
-        Loan loan = loanService.getLoanById(loanId);
+        if (fine.getLoan() == null || fine.getLoan().getLoanId() == null) {
+            throw new FineNotFoundException("Linked loan is required for creating a fine");
+        }
+
+        Loan loan = loanService.getLoanById(fine.getLoan().getLoanId());
+        if (loan == null) {
+            throw new FineNotFoundException("Loan not found with ID: " + fine.getLoan().getLoanId());
+        }
         fine.setLoan(loan);
+
+        // Small improvement: ensure 'paid' is never null
+        if (fine.getPaid() == null) {
+            fine.setPaid(false);
+        }
 
         return fineRepository.save(fine);
     }
@@ -37,7 +49,7 @@ public class FineServiceImpl implements FineService {
     @Override
     public Fine getFineById(Integer fineId) {
         return fineRepository.findById(fineId)
-                .orElseThrow(() -> new RuntimeException("Fine not found with ID: " + fineId));
+                .orElseThrow(() -> new FineNotFoundException("Fine not found with ID: " + fineId));
     }
 
     @Override
@@ -50,11 +62,13 @@ public class FineServiceImpl implements FineService {
         Fine fine = getFineById(fineId);
 
         fine.setAmount(fineDetails.getAmount());
-        fine.setPaid(fineDetails.getPaid());
+        fine.setPaid(fineDetails.getPaid() != null ? fineDetails.getPaid() : false);
 
-        if (fineDetails.getLoan() != null) {
-            Integer loanId = fineDetails.getLoan().getLoanId();
-            Loan loan = loanService.getLoanById(loanId);
+        if (fineDetails.getLoan() != null && fineDetails.getLoan().getLoanId() != null) {
+            Loan loan = loanService.getLoanById(fineDetails.getLoan().getLoanId());
+            if (loan == null) {
+                throw new FineNotFoundException("Loan not found with ID: " + fineDetails.getLoan().getLoanId());
+            }
             fine.setLoan(loan);
         }
 

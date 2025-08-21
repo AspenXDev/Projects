@@ -1,39 +1,54 @@
 package com.library.lms.controller;
 
-import com.library.lms.auth.JwtUtil;
-import com.library.lms.dto.AuthRequest;
-import com.library.lms.dto.AuthResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import com.library.lms.auth.JwtTokenProvider;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    public AuthController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider) {
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
+
+    // DTO for incoming JSON
+    public static class LoginRequest {
+        public String username;
+        public String password;
+    }
 
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(req.username, req.password)
+            );
 
-        // Use record accessor methods
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        authRequest.username(),
-                        authRequest.password()
+            String token = jwtTokenProvider.generateToken(auth);
+
+            return ResponseEntity.ok().body(
+                java.util.Map.of(
+                    "message", "Login successful",
+                    "token", token
                 )
-        );
-
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String token = jwtUtil.generateToken(userDetails);
-
-        return new AuthResponse(token);
+            );
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.badRequest().body(
+                java.util.Map.of(
+                    "error", "Bad Request",
+                    "message", "Bad credentials"
+                )
+            );
+        }
     }
 }

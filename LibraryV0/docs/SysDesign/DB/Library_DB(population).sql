@@ -1,5 +1,4 @@
-USE Library_DB;
--- ================================
+users-- ================================
 -- Data Population for Library_DB
 -- ================================
 
@@ -8,13 +7,13 @@ USE Library_DB;
 -- ----------------
 INSERT IGNORE INTO users (username, email, password_hash, role_id) VALUES
 -- Members (role_id = 1)
-('victor_chan', 'victor@example.com', '$2a$10$abcdefghijklmnopqrstuv', 1),
-('alice_walker', 'alice@example.com', '$2a$10$abcdefghijklmnopqrstuv', 1),
-('bob_smith', 'bob@example.com', '$2a$10$abcdefghijklmnopqrstuv', 1),
+('victor_chan', 'victor@example.com', '$2a$10$jnGwg/dDYpDmrF5xILFb2.pdtxNcV3I2QtMyYwk30efNQvcm3w4QS', 1),
+('alice_walker', 'alice@example.com', '$2a$10$jnGwg/dDYpDmrF5xILFb2.pdtxNcV3I2QtMyYwk30efNQvcm3w4QS', 1),
+('bob_smith', 'bob@example.com', '$2a$10$jnGwg/dDYpDmrF5xILFb2.pdtxNcV3I2QtMyYwk30efNQvcm3w4QS', 1),
 
 -- Librarians (role_id = 2)
-('librarian_john', 'john@example.com', '$2a$10$abcdefghijklmnopqrstuv', 2),
-('librarian_mary', 'mary@example.com', '$2a$10$abcdefghijklmnopqrstuv', 2);
+('librarian_john', 'john@example.com', '$2a$10$jnGwg/dDYpDmrF5xILFb2.pdtxNcV3I2QtMyYwk30efNQvcm3w4QS', 2),
+('librarian_mary', 'mary@example.com', '$2a$10$jnGwg/dDYpDmrF5xILFb2.pdtxNcV3I2QtMyYwk30efNQvcm3w4QS', 2);
 
 -- ----------------
 -- MEMBERS

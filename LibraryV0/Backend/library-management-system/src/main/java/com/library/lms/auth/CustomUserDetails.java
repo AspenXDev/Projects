@@ -19,12 +19,14 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getRoleName()));
+        String roleName = user.getRole().getRoleName(); 
+        // ✅ Ensure Spring recognizes it
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + roleName.toUpperCase()));
     }
 
     @Override
     public String getPassword() {
-        return user.getPasswordHash();  // <- Use passwordHash from DB
+        return user.getPasswordHash(); // must be BCrypt hash
     }
 
     @Override

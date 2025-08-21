@@ -1,13 +1,16 @@
 package com.library.lms.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 import java.util.Set;
-
 import jakarta.persistence.*;
 import com.library.lms.model.enums.BookStatus;
 
 @Entity
 @Table(name = "books")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "bookId")
 public class Book {
 
     @Id
@@ -55,27 +58,24 @@ public class Book {
     @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
 
+    // Lazy collections — ignore for JSON serialization
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("book")
     private Set<Loan> loans;
 
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("book")
     private Set<Reservation> reservations;
 
-    // ======================
-    // Constructors
-    // ======================
     public Book() {}
 
-    // Optional? Add a constructor with required fields
     public Book(String title, String author, String isbn) {
         this.title = title;
         this.author = author;
         this.isbn = isbn;
     }
 
-    // ======================
-    // Getters & Setters
-    // ======================
+    // Getters and Setters
 	public Integer getBookId() {
 		return bookId;
 	}
@@ -203,4 +203,5 @@ public class Book {
 	public void setReservations(Set<Reservation> reservations) {
 		this.reservations = reservations;
 	}
+
 }

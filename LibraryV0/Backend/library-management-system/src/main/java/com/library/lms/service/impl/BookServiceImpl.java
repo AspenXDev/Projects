@@ -21,6 +21,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book createBook(Book book) {
+        adjustCopies(book);
         return bookRepository.save(book);
     }
 
@@ -45,11 +46,16 @@ public class BookServiceImpl implements BookService {
         existing.setPublishedYear(book.getPublishedYear());
         existing.setCategory(book.getCategory());
         existing.setTotalCopies(book.getTotalCopies());
-        existing.setAvailableCopies(book.getAvailableCopies());
         existing.setLocationSection(book.getLocationSection());
         existing.setLocationShelf(book.getLocationShelf());
         existing.setLocationRow(book.getLocationRow());
         existing.setStatus(book.getStatus());
+
+        // Automatically adjust availableCopies
+        if (book.getAvailableCopies() != null) {
+            existing.setAvailableCopies(book.getAvailableCopies());
+        }
+        adjustCopies(existing);
 
         return bookRepository.save(existing);
     }
@@ -65,5 +71,24 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<Book> getBooksByStatus(BookStatus status) {
         return bookRepository.findByStatus(status);
+    }
+
+    // ======================
+    // Private helper
+    // ======================
+    /**
+     * Ensures availableCopies is never negative and never exceeds totalCopies.
+     * Automatically caps availableCopies at totalCopies if needed.
+     */
+    private void adjustCopies(Book book) {
+        if (book.getTotalCopies() < 0) {
+            book.setTotalCopies(0);
+        }
+        if (book.getAvailableCopies() < 0) {
+            book.setAvailableCopies(0);
+        }
+        if (book.getAvailableCopies() > book.getTotalCopies()) {
+            book.setAvailableCopies(book.getTotalCopies());
+        }
     }
 }

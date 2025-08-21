@@ -2,11 +2,15 @@ package com.library.lms.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.library.lms.model.Book;
 import com.library.lms.model.enums.BookStatus;
 import com.library.lms.service.BookService;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @RestController
 @RequestMapping("/books")
@@ -19,7 +23,7 @@ public class BookController {
     }
 
     // ======================
-    // CRUD
+    // CRUD Endpoints
     // ======================
     @GetMapping
     public List<Book> getAllBooks() {
@@ -47,7 +51,7 @@ public class BookController {
     }
 
     // ======================
-    // Convenience endpoints
+    // Convenience Endpoints
     // ======================
     @GetMapping("/available")
     public List<Book> getAvailableBooks() {
@@ -62,5 +66,18 @@ public class BookController {
     @GetMapping("/reserved")
     public List<Book> getReservedBooks() {
         return bookService.getBooksByStatus(BookStatus.Reserved);
+    }
+
+    // ======================
+    // Exception Handlers
+    // ======================
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<String> handleNotFound(EntityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleBadRequest(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }

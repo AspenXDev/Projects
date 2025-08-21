@@ -73,6 +73,9 @@ public class Book {
         this.isbn = isbn;
     }
 
+    // ======================
+    // Getters & Setters
+    // ======================
 	public Integer getBookId() {
 		return bookId;
 	}
@@ -200,8 +203,4 @@ public class Book {
 	public void setReservations(Set<Reservation> reservations) {
 		this.reservations = reservations;
 	}
-
-    // ======================
-    // Getters & Setters
-    // ======================
 }

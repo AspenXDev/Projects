@@ -19,6 +19,11 @@ public class BookServiceImpl implements BookService {
         this.bookRepository = bookRepository;
     }
 
+    
+    /**
+     * Creates a new book. 
+     * Automatically adjusts availableCopies if it exceeds totalCopies.
+     */
     @Override
     public Book createBook(Book book) {
         adjustCopies(book);
@@ -36,6 +41,10 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findAll();
     }
 
+    /**
+     * Updates an existing book.
+     * Automatically adjusts availableCopies if it exceeds totalCopies.
+     */
     @Override
     public Book updateBook(Integer id, Book book) {
         Book existing = getBookById(id);
@@ -74,7 +83,7 @@ public class BookServiceImpl implements BookService {
     }
 
     // ======================
-    // Private helper
+    // Helper Function Below
     // ======================
     /**
      * Ensures availableCopies is never negative and never exceeds totalCopies.

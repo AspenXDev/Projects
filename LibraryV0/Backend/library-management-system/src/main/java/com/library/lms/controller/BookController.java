@@ -37,11 +37,13 @@ public class BookController {
 
     @PostMapping
     public Book createBook(@RequestBody Book book) {
+        // Note: availableCopies will be automatically capped to totalCopies by service
         return bookService.createBook(book);
     }
 
     @PutMapping("/{id}")
     public Book updateBook(@PathVariable Integer id, @RequestBody Book bookDetails) {
+        // Note: availableCopies will be automatically capped to totalCopies by service
         return bookService.updateBook(id, bookDetails);
     }
 

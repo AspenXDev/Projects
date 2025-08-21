@@ -2,31 +2,31 @@
 <configuration scan="true">
 
     <!-- Console appender -->
-    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <!-- File appender -->
-    <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>backend.log</file>
+    <!-- File appender with daily rotation -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>D:/ICT/Projects/LibraryV0/Backend/library-management-system/logs/backend.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>backend.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>D:/ICT/Projects/LibraryV0/Backend/library-management-system/logs/backend.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <!-- Root logger: logs everything DEBUG+ -->
+    <!-- Root logger -->
     <root level="DEBUG">
-        <appender-ref ref="Console" />
-        <appender-ref ref="File" />
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
     </root>
 
-    <!-- Optional: reduce Hibernate SQL verbosity in console -->
+    <!-- Hibernate SQL logging (optional) -->
     <logger name="org.hibernate.SQL" level="DEBUG" />
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
 

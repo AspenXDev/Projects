@@ -1,8 +1,10 @@
 package com.library.lms.repository;
 
-import com.library.lms.model.Loan;
-import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.library.lms.model.Loan;
 
 public interface LoanRepository extends JpaRepository<Loan, Integer> {
 

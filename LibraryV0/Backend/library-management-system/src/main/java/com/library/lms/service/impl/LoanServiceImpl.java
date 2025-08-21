@@ -1,16 +1,19 @@
 package com.library.lms.service.impl;
 
-import com.library.lms.model.Loan;
-import com.library.lms.model.Member;
-import com.library.lms.model.Book;
-import com.library.lms.repository.LoanRepository;
-import com.library.lms.service.LoanService;
-import com.library.lms.service.MemberService;
-import com.library.lms.service.BookService;
-import jakarta.transaction.Transactional;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.library.lms.mapper.LoanMapper;
+import com.library.lms.model.Book;
+import com.library.lms.model.Loan;
+import com.library.lms.model.Member;
+import com.library.lms.repository.LoanRepository;
+import com.library.lms.service.BookService;
+import com.library.lms.service.LoanService;
+import com.library.lms.service.MemberService;
+
+import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
@@ -31,13 +34,11 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public Loan createLoan(Loan loan) {
         // Ensure linked Member and Book exist
-        Integer memberId = loan.getMember().getMemberId();
-        Member member = memberService.getMemberById(memberId);
-        loan.setMember(member);
+        Member member = memberService.getMemberById(loan.getMember().getMemberId());
+        Book book = bookService.getBookById(loan.getBook().getBookId());
 
-        Integer bookId = loan.getBook().getBookId();
-        Book book = bookService.getBookById(bookId);
-        loan.setBook(book);
+        // Use LoanMapper to set Member and Book
+        LoanMapper.toEntityWithMemberAndBook(loan, member, book);
 
         return loanRepository.save(loan);
     }
@@ -63,19 +64,16 @@ public class LoanServiceImpl implements LoanService {
         loan.setRenewCount(loanDetails.getRenewCount());
         loan.setStatus(loanDetails.getStatus());
 
-        // Update linked Member if provided
-        if (loanDetails.getMember() != null) {
-            Integer memberId = loanDetails.getMember().getMemberId();
-            Member member = memberService.getMemberById(memberId);
-            loan.setMember(member);
-        }
+        // Update linked Member and Book if provided, using the mapper
+        Member member = loanDetails.getMember() != null
+                ? memberService.getMemberById(loanDetails.getMember().getMemberId())
+                : loan.getMember();
 
-        // Update linked Book if provided
-        if (loanDetails.getBook() != null) {
-            Integer bookId = loanDetails.getBook().getBookId();
-            Book book = bookService.getBookById(bookId);
-            loan.setBook(book);
-        }
+        Book book = loanDetails.getBook() != null
+                ? bookService.getBookById(loanDetails.getBook().getBookId())
+                : loan.getBook();
+
+        LoanMapper.toEntityWithMemberAndBook(loan, member, book);
 
         return loanRepository.save(loan);
     }

@@ -1,7 +1,8 @@
 package com.library.lms.service;
 
-import com.library.lms.model.Book;
 import java.util.List;
+import com.library.lms.model.Book;
+import com.library.lms.model.enums.BookStatus;
 
 public interface BookService {
     Book createBook(Book book);
@@ -9,5 +10,5 @@ public interface BookService {
     List<Book> getAllBooks();
     Book updateBook(Integer id, Book book);
     void deleteBook(Integer id);
-    List<Book> getBooksByStatus(String status);  // declare only
+    List<Book> getBooksByStatus(BookStatus status);  // use enum
 }

@@ -1,7 +1,8 @@
 package com.library.lms.service;
 
-import com.library.lms.model.Loan;
 import java.util.List;
+
+import com.library.lms.model.Loan;
 
 public interface LoanService {
     Loan createLoan(Loan loan);

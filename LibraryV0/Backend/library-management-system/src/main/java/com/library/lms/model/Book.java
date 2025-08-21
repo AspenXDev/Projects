@@ -1,8 +1,10 @@
 package com.library.lms.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Set;
+
+import jakarta.persistence.*;
+import com.library.lms.model.enums.BookStatus;
 
 @Entity
 @Table(name = "books")
@@ -13,19 +15,19 @@ public class Book {
     @Column(name = "book_id")
     private Integer bookId;
 
-    @Column(name = "title", length = 200, nullable = false)
+    @Column(length = 200, nullable = false)
     private String title;
 
-    @Column(name = "author", length = 150, nullable = false)
+    @Column(length = 150, nullable = false)
     private String author;
 
-    @Column(name = "isbn", length = 13, nullable = false, unique = true)
-    private String isbn; // CHAR(13) in DB; length=13 here is fine
+    @Column(length = 13, nullable = false, unique = true)
+    private String isbn;
 
     @Column(name = "published_year")
     private Integer publishedYear;
 
-    @Column(name = "category", length = 50)
+    @Column(length = 50)
     private String category;
 
     @Column(name = "total_copies", nullable = false)
@@ -43,15 +45,14 @@ public class Book {
     @Column(name = "location_row")
     private Integer locationRow;
 
-    // ENUM('Available','Borrowed','Reserved')
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+    @Column(nullable = false)
     private BookStatus status = BookStatus.Available;
 
-    @Column(name = "created_at", insertable = false, updatable = false, nullable = false)
+    @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", insertable = false, updatable = false, nullable = false)
+    @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
@@ -60,9 +61,18 @@ public class Book {
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
     private Set<Reservation> reservations;
 
-    public enum BookStatus { Available, Borrowed, Reserved }
-    
-    // Getters and Setters
+    // ======================
+    // Constructors
+    // ======================
+    public Book() {}
+
+    // Optional? Add a constructor with required fields
+    public Book(String title, String author, String isbn) {
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+    }
+
 	public Integer getBookId() {
 		return bookId;
 	}
@@ -190,4 +200,8 @@ public class Book {
 	public void setReservations(Set<Reservation> reservations) {
 		this.reservations = reservations;
 	}
+
+    // ======================
+    // Getters & Setters
+    // ======================
 }

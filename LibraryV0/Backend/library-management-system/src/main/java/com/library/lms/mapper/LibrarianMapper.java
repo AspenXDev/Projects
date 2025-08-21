@@ -1,34 +1,23 @@
 package com.library.lms.mapper;
 
-import com.library.lms.dto.LibrarianDTO;
 import com.library.lms.model.Librarian;
 import com.library.lms.model.User;
 
 public class LibrarianMapper {
 
-    public static LibrarianDTO toDTO(Librarian librarian) {
+    public static Librarian toEntityWithUser(Librarian librarian, User user) {
         if (librarian == null) return null;
-        return new LibrarianDTO(
-                librarian.getLibrarianId() != null ? librarian.getLibrarianId().longValue() : null,
-                librarian.getFullName(),
-                librarian.getUser() != null ? librarian.getUser().getEmail() : null,
-                null
-        );
-    }
+        if (user == null) throw new IllegalArgumentException("User cannot be null");
 
-    public static Librarian toEntity(LibrarianDTO dto) {
-        if (dto == null) return null;
-
-        Librarian librarian = new Librarian();
-        librarian.setLibrarianId(dto.id() != null ? dto.id().intValue() : null);
-        librarian.setFullName(dto.fullName());
-
+        librarian.setUser(user);
         return librarian;
     }
 
-    // Chained mapper: Create Librarian with a User entity
-    public static Librarian toEntityWithUser(LibrarianDTO dto, User user) {
-        Librarian librarian = toEntity(dto);
+    // Optional: create a new Librarian from scratch
+    public static Librarian createLibrarian(String fullName, User user) {
+        if (user == null) throw new IllegalArgumentException("User cannot be null");
+        Librarian librarian = new Librarian();
+        librarian.setFullName(fullName);
         librarian.setUser(user);
         return librarian;
     }

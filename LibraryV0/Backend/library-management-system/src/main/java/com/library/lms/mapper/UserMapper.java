@@ -1,8 +1,8 @@
 package com.library.lms.mapper;
 
 import com.library.lms.dto.UserDTO;
+import com.library.lms.model.Role;
 import com.library.lms.model.User;
-import com.library.lms.model.enums.Role;
 
 public class UserMapper {
 

@@ -1,13 +1,13 @@
 package com.library.lms.service.impl;
 
+import java.util.List;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.library.lms.model.Book;
+import com.library.lms.model.enums.BookStatus;
 import com.library.lms.repository.BookRepository;
 import com.library.lms.service.BookService;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -37,8 +37,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book updateBook(Integer id, Book book) {
-        Book existing = bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Book not found with id " + id));
+        Book existing = getBookById(id);
 
         existing.setTitle(book.getTitle());
         existing.setAuthor(book.getAuthor());
@@ -64,7 +63,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<Book> getBooksByStatus(String status) {
+    public List<Book> getBooksByStatus(BookStatus status) {
         return bookRepository.findByStatus(status);
     }
 }

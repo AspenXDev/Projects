@@ -1,13 +1,17 @@
 package com.library.lms.service;
 
-import com.library.lms.model.Member;
-import com.library.lms.dto.MemberDTO;
 import java.util.List;
+import com.library.lms.model.Member;
 
 public interface MemberService {
-    Member createMember(MemberDTO memberDTO);
-    Member updateMember(Integer id, MemberDTO memberDTO);
-    void deleteMember(Integer id);
+
+    Member createMember(Member member);
+
+    Member updateMember(Integer memberId, Member member);
+
+    Member getMemberById(Integer memberId);
+
     List<Member> getAllMembers();
-    Member getMemberById(Integer id);
+
+    void deleteMember(Integer memberId);
 }

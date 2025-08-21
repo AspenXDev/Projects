@@ -1,3 +1,6 @@
 package com.library.lms.dto;
 
-public record AuthRequest(String Username, String Password) {}
+public record AuthRequest(
+    String username,
+    String password
+) {}

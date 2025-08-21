@@ -1,6 +1,5 @@
 package com.library.lms.controller;
 
-import com.library.lms.auth.CustomUserDetailsService;
 import com.library.lms.auth.JwtUtil;
 import com.library.lms.dto.AuthRequest;
 import com.library.lms.dto.AuthResponse;
@@ -9,39 +8,31 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthController {   // <-- class starts here
+public class AuthController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
 
     @Autowired
     private JwtUtil jwtUtil;
 
     @PostMapping("/login")
     public AuthResponse login(@RequestBody AuthRequest authRequest) {
-        // authenticate user
+
+        // Use record accessor methods
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        authRequest.Username(),
-                        authRequest.Password()
+                        authRequest.username(),
+                        authRequest.password()
                 )
         );
 
-        // load full UserDetails
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(authRequest.Username());
-
-        // generate JWT token using UserDetails
-        final String token = jwtUtil.generateToken(userDetails);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String token = jwtUtil.generateToken(userDetails);
 
         return new AuthResponse(token);
     }

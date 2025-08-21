@@ -1,38 +1,39 @@
 package com.library.lms.mapper;
 
-import com.library.lms.dto.MemberDTO;
-import com.library.lms.dto.LibrarianDTO;
-import com.library.lms.dto.UserDTO;
-import com.library.lms.model.Member;
 import com.library.lms.model.Librarian;
+import com.library.lms.model.Member;
+import com.library.lms.model.Role;
 import com.library.lms.model.User;
 
 public class MapperFactory {
 
-    // Default: create User and assign safe role
-    public static User toUser(UserDTO userDTO) {
-        return UserMapper.toEntity(userDTO);
+    public static User createUser(String username, String email, String passwordHash, String roleName) {
+        User user = new User();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPasswordHash(passwordHash);
+        user.setIsActive(true);
+        user.setRole(new Role(roleName));
+        return user;
     }
 
-    // Combine User + Member
-    public static Member toMember(MemberDTO memberDTO) {
-        User user = toUser(new UserDTO(
-                null,
-                memberDTO.fullName().toLowerCase().replaceAll("\\s+", ""),
-                memberDTO.email(),
-                null
-        ));
-        return MemberMapper.toEntityWithUser(memberDTO, user);
+    public static Member toMember(Member member) {
+        User user = createUser(
+                member.getFullName().toLowerCase().replaceAll("\\s+", ""),
+                member.getUser() != null ? member.getUser().getEmail() : "",
+                member.getUser() != null ? member.getUser().getPasswordHash() : "",
+                "members"
+        );
+        return MemberMapper.toEntityWithUser(member, user);
     }
 
-    // Combine User + Librarian
-    public static Librarian toLibrarian(LibrarianDTO librarianDTO) {
-        User user = toUser(new UserDTO(
-                null,
-                librarianDTO.fullName().toLowerCase().replaceAll("\\s+", ""),
-                librarianDTO.email(),
-                "Librarian"
-        ));
-        return LibrarianMapper.toEntityWithUser(librarianDTO, user);
+    public static Librarian toLibrarian(Librarian librarian) {
+        User user = createUser(
+                librarian.getFullName().toLowerCase().replaceAll("\\s+", ""),
+                librarian.getUser() != null ? librarian.getUser().getEmail() : "",
+                librarian.getUser() != null ? librarian.getUser().getPasswordHash() : "",
+                "librarians"
+        );
+        return LibrarianMapper.toEntityWithUser(librarian, user);
     }
 }

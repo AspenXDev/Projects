@@ -1,21 +1,10 @@
 package com.library.lms.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "members")
@@ -28,6 +17,7 @@ public class Member {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JsonIgnoreProperties({"password"}) // avoid exposing sensitive fields
     private User user;
 
     @Column(name = "full_name", length = 100, nullable = false)
@@ -39,7 +29,6 @@ public class Member {
     @Column(name = "membership_valid_until", nullable = false)
     private LocalDate membershipValidUntil;
 
-    // ENUM('Active','Expired') - must use exact-case enum to match DB strings
     @Enumerated(EnumType.STRING)
     @Column(name = "membership_status", nullable = false)
     private MembershipStatus membershipStatus = MembershipStatus.Active;
@@ -51,9 +40,11 @@ public class Member {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"member"})
     private Set<Loan> loans;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"member"})
     private Set<Reservation> reservations;
 
     public enum MembershipStatus { Active, Expired }
@@ -138,4 +129,7 @@ public class Member {
 	public void setReservations(Set<Reservation> reservations) {
 		this.reservations = reservations;
 	}
+
+    // Getters and Setters
+
 }

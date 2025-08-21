@@ -12,6 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.library.lms.auth.JwtAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 public class SecurityConfig {
@@ -30,8 +31,8 @@ public class SecurityConfig {
                 // Always public
             		.requestMatchers("/auth/**").permitAll()   // login endpoints
             		.requestMatchers("/books/**").permitAll()  // books too
-                // All other endpoints require authentication
-                .anyRequest().authenticated()
+            	    .requestMatchers(HttpMethod.GET, "/**").permitAll()   // allow all GET endpoints for testing
+                .anyRequest().authenticated()							 // All other endpoints require authentication
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

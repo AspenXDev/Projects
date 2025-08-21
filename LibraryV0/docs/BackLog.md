@@ -5,7 +5,7 @@
 1. **Database Schema Finalization**
    - Tables: `users`, `members`, `librarians`, `books`, `loans`, `reservations`, `fines`.
    - RBAC support via `roles` table.
-   - Timestamp tracking (`created_at`, `updated_at`) for all mutable tables.
+   - Timestamp tracking (`created_at`, `updated_at`) for all mutable tables. (Jackson JSR for Timestamp in SQL<->ISO-8601 in Java)
    - Reservation queue (FIFO) and 3-day hold logic accounted for in design.
 2. **Project Setup**
    - Scaffolded Spring Boot project with RESTful APIs.

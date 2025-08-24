@@ -1,16 +1,11 @@
 package com.library.lms.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.time.LocalDateTime;
-import java.util.Set;
-import jakarta.persistence.*;
 import com.library.lms.model.enums.BookStatus;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "books")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "bookId")
 public class Book {
 
     @Id
@@ -18,28 +13,24 @@ public class Book {
     @Column(name = "book_id")
     private Integer bookId;
 
-    @Column(length = 200, nullable = false)
     private String title;
-
-    @Column(length = 150, nullable = false)
     private String author;
 
-    @Column(length = 13, nullable = false, unique = true)
+    @Column(unique = true, nullable = false, length = 13)
     private String isbn;
 
     @Column(name = "published_year")
     private Integer publishedYear;
 
-    @Column(length = 50)
     private String category;
 
-    @Column(name = "total_copies", nullable = false)
-    private Integer totalCopies = 1;
+    @Column(name = "total_copies")
+    private Integer totalCopies;
 
-    @Column(name = "available_copies", nullable = false)
-    private Integer availableCopies = 1;
+    @Column(name = "available_copies")
+    private Integer availableCopies;
 
-    @Column(name = "location_section", length = 50)
+    @Column(name = "location_section")
     private String locationSection;
 
     @Column(name = "location_shelf")
@@ -49,159 +40,84 @@ public class Book {
     private Integer locationRow;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private BookStatus status = BookStatus.Available;
+    private BookStatus status;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
+    @Column(name = "created_at", updatable = false, insertable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", insertable = false, updatable = false)
+    @Column(name = "updated_at", insertable = false)
     private LocalDateTime updatedAt;
 
-    // Lazy collections — ignore for JSON serialization
-    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
-    @JsonIgnoreProperties("book")
-    private Set<Loan> loans;
-
-    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
-    @JsonIgnoreProperties("book")
-    private Set<Reservation> reservations;
-
+    // ======================
+    // Constructors
+    // ======================
     public Book() {}
 
     public Book(String title, String author, String isbn) {
         this.title = title;
         this.author = author;
         this.isbn = isbn;
+        this.totalCopies = 1;
+        this.availableCopies = 1;
+        this.status = BookStatus.Available;
     }
 
+    public Book(String title, String author, String isbn, BookStatus status) {
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+        this.status = status;
+        this.totalCopies = 1;
+        this.availableCopies = 1;
+    }
+
+    // ======================
     // Getters and Setters
-	public Integer getBookId() {
-		return bookId;
-	}
+    // ======================
+    public Integer getBookId() { return bookId; }
+    public void setBookId(Integer bookId) { this.bookId = bookId; }
 
-	public void setBookId(Integer bookId) {
-		this.bookId = bookId;
-	}
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-	public String getTitle() {
-		return title;
-	}
+    public String getAuthor() { return author; }
+    public void setAuthor(String author) { this.author = author; }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public String getIsbn() { return isbn; }
+    public void setIsbn(String isbn) { this.isbn = isbn; }
 
-	public String getAuthor() {
-		return author;
-	}
+    public Integer getPublishedYear() { return publishedYear; }
+    public void setPublishedYear(Integer publishedYear) { this.publishedYear = publishedYear; }
 
-	public void setAuthor(String author) {
-		this.author = author;
-	}
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
-	public String getIsbn() {
-		return isbn;
-	}
+    public Integer getTotalCopies() { return totalCopies; }
+    public void setTotalCopies(Integer totalCopies) { this.totalCopies = totalCopies; }
 
-	public void setIsbn(String isbn) {
-		this.isbn = isbn;
-	}
+    public Integer getAvailableCopies() { return availableCopies; }
+    public void setAvailableCopies(Integer availableCopies) { this.availableCopies = availableCopies; }
 
-	public Integer getPublishedYear() {
-		return publishedYear;
-	}
+    public String getLocationSection() { return locationSection; }
+    public void setLocationSection(String locationSection) { this.locationSection = locationSection; }
 
-	public void setPublishedYear(Integer publishedYear) {
-		this.publishedYear = publishedYear;
-	}
+    public Integer getLocationShelf() { return locationShelf; }
+    public void setLocationShelf(Integer locationShelf) { this.locationShelf = locationShelf; }
 
-	public String getCategory() {
-		return category;
-	}
+    public Integer getLocationRow() { return locationRow; }
+    public void setLocationRow(Integer locationRow) { this.locationRow = locationRow; }
 
-	public void setCategory(String category) {
-		this.category = category;
-	}
+    public BookStatus getStatus() { return status; }
+    public void setStatus(BookStatus status) { this.status = status; }
 
-	public Integer getTotalCopies() {
-		return totalCopies;
-	}
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
 
-	public void setTotalCopies(Integer totalCopies) {
-		this.totalCopies = totalCopies;
-	}
-
-	public Integer getAvailableCopies() {
-		return availableCopies;
-	}
-
-	public void setAvailableCopies(Integer availableCopies) {
-		this.availableCopies = availableCopies;
-	}
-
-	public String getLocationSection() {
-		return locationSection;
-	}
-
-	public void setLocationSection(String locationSection) {
-		this.locationSection = locationSection;
-	}
-
-	public Integer getLocationShelf() {
-		return locationShelf;
-	}
-
-	public void setLocationShelf(Integer locationShelf) {
-		this.locationShelf = locationShelf;
-	}
-
-	public Integer getLocationRow() {
-		return locationRow;
-	}
-
-	public void setLocationRow(Integer locationRow) {
-		this.locationRow = locationRow;
-	}
-
-	public BookStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(BookStatus status) {
-		this.status = status;
-	}
-
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public LocalDateTime getUpdatedAt() {
-		return updatedAt;
-	}
-
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
-	}
-
-	public Set<Loan> getLoans() {
-		return loans;
-	}
-
-	public void setLoans(Set<Loan> loans) {
-		this.loans = loans;
-	}
-
-	public Set<Reservation> getReservations() {
-		return reservations;
-	}
-
-	public void setReservations(Set<Reservation> reservations) {
-		this.reservations = reservations;
-	}
-
+    @Override
+    public String toString() {
+        return String.format(
+            "Book[id=%d, title='%s', author='%s', isbn='%s', status=%s]",
+            bookId, title, author, isbn, status
+        );
+    }
 }

@@ -1,33 +1,70 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<configuration scan="true">
+<configuration scan="true" scanPeriod="30 seconds">
 
-    <!-- Console appender -->
+    <!-- Property for log file -->
+    <property name="LOG_FILE" value="logs/backend.log"/>
+
+    <!-- =======================
+         CONSOLE APPENDER (colorized)
+         ======================= -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+            </pattern>
+            <immediateFlush>true</immediateFlush>
         </encoder>
+        <withJansi>true</withJansi> <!-- Enable ANSI colors -->
     </appender>
 
-    <!-- File appender with daily rotation -->
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>D:/ICT/Projects/LibraryV0/Backend/library-management-system/logs/backend.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>D:/ICT/Projects/LibraryV0/Backend/library-management-system/logs/backend.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
-        </rollingPolicy>
+    <!-- =======================
+         FILE APPENDER (flushed immediately)
+         ======================= -->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${LOG_FILE}</file>
+        <append>true</append>
+        <immediateFlush>true</immediateFlush>
         <encoder>
-            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
+    <!-- =======================
+         SPECIAL APPENDER FOR UNIFIED REQUEST LOGS
+         ======================= -->
+    <appender name="REQUEST_LOG" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %highlight(%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n){FATAL=red bold, ERROR=red, WARN=yellow bold, INFO=cyan, DEBUG=green, TRACE=blue}
+            </pattern>
+            <immediateFlush>true</immediateFlush>
+        </encoder>
+        <withJansi>true</withJansi>
+    </appender>
+
+    <!-- =======================
+         LOGGERS
+         ======================= -->
     <!-- Root logger -->
-    <root level="DEBUG">
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="FILE" />
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
     </root>
 
-    <!-- Hibernate SQL logging (optional) -->
-    <logger name="org.hibernate.SQL" level="DEBUG" />
-    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
+    <!-- Show debug for your app -->
+    <logger name="com.library.lms" level="DEBUG"/>
+
+    <!-- Show DEBUG specifically for request logs -->
+    <logger name="com.library.lms.config.RequestLoggingConfig" level="INFO" additivity="false">
+        <appender-ref ref="REQUEST_LOG"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- SQL logs -->
+    <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+
+    <!-- Spring web logs -->
+    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="DEBUG"/>
+    <logger name="org.apache.catalina.core" level="INFO"/>
 
 </configuration>

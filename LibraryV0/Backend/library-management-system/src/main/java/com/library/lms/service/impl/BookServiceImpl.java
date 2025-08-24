@@ -1,13 +1,14 @@
 package com.library.lms.service.impl;
 
-import java.util.List;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import com.library.lms.model.Book;
 import com.library.lms.model.enums.BookStatus;
 import com.library.lms.repository.BookRepository;
 import com.library.lms.service.BookService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -19,21 +20,16 @@ public class BookServiceImpl implements BookService {
         this.bookRepository = bookRepository;
     }
 
-    
-    /**
-     * Creates a new book. 
-     * Automatically adjusts availableCopies if it exceeds totalCopies.
-     */
     @Override
     public Book createBook(Book book) {
-        adjustCopies(book);
+        normalizeCopies(book);
         return bookRepository.save(book);
     }
 
     @Override
     public Book getBookById(Integer id) {
         return bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Book not found with id " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Book not found with id: " + id));
     }
 
     @Override
@@ -41,10 +37,6 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findAll();
     }
 
-    /**
-     * Updates an existing book.
-     * Automatically adjusts availableCopies if it exceeds totalCopies.
-     */
     @Override
     public Book updateBook(Integer id, Book book) {
         Book existing = getBookById(id);
@@ -60,11 +52,12 @@ public class BookServiceImpl implements BookService {
         existing.setLocationRow(book.getLocationRow());
         existing.setStatus(book.getStatus());
 
-        // Automatically adjust availableCopies
+        // Only overwrite available copies if explicitly provided
         if (book.getAvailableCopies() != null) {
             existing.setAvailableCopies(book.getAvailableCopies());
         }
-        adjustCopies(existing);
+
+        normalizeCopies(existing);
 
         return bookRepository.save(existing);
     }
@@ -72,7 +65,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public void deleteBook(Integer id) {
         if (!bookRepository.existsById(id)) {
-            throw new EntityNotFoundException("Book not found with id " + id);
+            throw new EntityNotFoundException("Book not found with id: " + id);
         }
         bookRepository.deleteById(id);
     }
@@ -83,17 +76,13 @@ public class BookServiceImpl implements BookService {
     }
 
     // ======================
-    // Helper Function Below
+    // Helper
     // ======================
-    /**
-     * Ensures availableCopies is never negative and never exceeds totalCopies.
-     * Automatically caps availableCopies at totalCopies if needed.
-     */
-    private void adjustCopies(Book book) {
-        if (book.getTotalCopies() < 0) {
+    private void normalizeCopies(Book book) {
+        if (book.getTotalCopies() == null || book.getTotalCopies() < 0) {
             book.setTotalCopies(0);
         }
-        if (book.getAvailableCopies() < 0) {
+        if (book.getAvailableCopies() == null || book.getAvailableCopies() < 0) {
             book.setAvailableCopies(0);
         }
         if (book.getAvailableCopies() > book.getTotalCopies()) {

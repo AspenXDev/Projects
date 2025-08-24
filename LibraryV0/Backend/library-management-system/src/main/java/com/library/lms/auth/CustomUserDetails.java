@@ -1,13 +1,12 @@
 package com.library.lms.auth;
 
-import java.util.Collection;
-import java.util.Collections;
-
+import com.library.lms.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.library.lms.model.User;
+import java.util.Collection;
+import java.util.Collections;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -19,14 +18,14 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String roleName = user.getRole().getRoleName(); 
-        // ✅ Ensure Spring recognizes it
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + roleName.toUpperCase()));
+        // Spring Security expects roles prefixed with "ROLE_"
+        String roleName = user.getRole().getRoleName();
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + roleName));
     }
 
     @Override
     public String getPassword() {
-        return user.getPasswordHash(); // must be BCrypt hash
+        return user.getPasswordHash();
     }
 
     @Override
@@ -36,7 +35,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return user.getIsActive();
     }
 
     @Override
@@ -46,15 +45,11 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return user.getIsActive();
     }
 
     @Override
     public boolean isEnabled() {
         return user.getIsActive();
-    }
-
-    public User getUser() {
-        return user;
     }
 }

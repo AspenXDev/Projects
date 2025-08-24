@@ -13,22 +13,21 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#e0f0ff] p-6">
-      <h1 className="text-4xl font-bold text-[#003366] mb-6">Login</h1>
-
-      <select
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-        className="mb-4 p-2 border rounded"
-      >
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <h1>Login</h1>
+      <select value={role} onChange={(e) => setRole(e.target.value)}>
         <option value="member">Member</option>
         <option value="librarian">Librarian</option>
       </select>
-
-      <button
-        onClick={handleLogin}
-        className="px-4 py-2 bg-[#007bff] text-white rounded"
-      >
+      <button onClick={handleLogin} style={{ marginTop: "1rem" }}>
         Login
       </button>
     </div>

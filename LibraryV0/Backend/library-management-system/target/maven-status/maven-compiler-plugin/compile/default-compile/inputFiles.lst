@@ -15,6 +15,7 @@ D:\ICT\Projects\LibraryV0\Backend\library-management-system\src\main\java\com\li
 D:\ICT\Projects\LibraryV0\Backend\library-management-system\src\main\java\com\library\lms\config\ResponseLoggingFilter.java
 D:\ICT\Projects\LibraryV0\Backend\library-management-system\src\main\java\com\library\lms\config\SecurityConfig.java
 D:\ICT\Projects\LibraryV0\Backend\library-management-system\src\main\java\com\library\lms\config\UnifiedRequestLoggingFilter.java
+D:\ICT\Projects\LibraryV0\Backend\library-management-system\src\main\java\com\library\lms\config\WebConfig.java
 D:\ICT\Projects\LibraryV0\Backend\library-management-system\src\main\java\com\library\lms\controller\AuthController.java
 D:\ICT\Projects\LibraryV0\Backend\library-management-system\src\main\java\com\library\lms\controller\BookController.java
 D:\ICT\Projects\LibraryV0\Backend\library-management-system\src\main\java\com\library\lms\controller\FineController.java

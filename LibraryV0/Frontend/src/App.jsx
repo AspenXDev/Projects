@@ -1,17 +1,38 @@
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
-import Books from "./pages/Books";
-import Members from "./pages/Members";
+import { AuthProvider } from "./contexts/AuthContext";
+import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
+import MemberDashboard from "./pages/MemberDashboard";
+import LibrarianDashboard from "./pages/LibrarianDashboard";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/books" element={<Books />} />
-        <Route path="/members" element={<Members />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/member-dashboard"
+            element={
+              <PrivateRoute roles={["member"]}>
+                <MemberDashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/librarian-dashboard"
+            element={
+              <PrivateRoute roles={["librarian"]}>
+                <LibrarianDashboard />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

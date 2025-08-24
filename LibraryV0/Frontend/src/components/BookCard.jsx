@@ -1,14 +1,24 @@
-export default function BookCard({ book }) {
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
+
+const BookCard = ({ book }) => {
   return (
-    <div
-      style={{
-        border: "1px solid #ddd",
-        padding: "1rem",
-        marginBottom: "0.5rem",
-      }}
-    >
-      <h3>{book.title}</h3>
-      <p>Status: {book.status}</p>
+    <div className="book-card">
+      <h2>{book.title}</h2>
+      <p>
+        <strong>Author:</strong> {book.author}
+      </p>
+      <p>
+        <strong>ISBN:</strong> {book.isbn}
+      </p>
+      <p>
+        <strong>Status:</strong> {book.status}
+      </p>
+      <p>
+        <strong>Available Copies:</strong> {book.available_copies}
+      </p>
     </div>
   );
-}
+};
+
+export default BookCard;

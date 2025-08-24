@@ -1,0 +1,48 @@
+/* Container */
+.landing-container {
+  padding: 20px;
+  font-family: "Inter", sans-serif;
+  background-color: #f0f8ff;
+  color: #003366;
+}
+
+/* Cards Container */
+.book-card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 20px;
+  justify-content: center; /* centers cards horizontally */
+}
+
+/* Individual Book Card */
+.book-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  width: 250px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.book-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.book-card h3 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #003366;
+}
+
+.book-card p {
+  margin: 5px 0;
+  font-size: 0.95rem;
+}
+
+.book-card .label {
+  font-weight: 600;
+  color: #0055aa;
+}

@@ -1,5 +1,5 @@
-import { useContext } from "react";
-import { AuthContext } from "../contexts/AuthContext";
+import React from "react";
+import "./BookCard.css";
 
 const BookCard = ({ book }) => {
   return (
@@ -9,13 +9,14 @@ const BookCard = ({ book }) => {
         <strong>Author:</strong> {book.author}
       </p>
       <p>
-        <strong>ISBN:</strong> {book.isbn}
+        <strong>Available Copies:</strong> {book.available_copies}
       </p>
       <p>
         <strong>Status:</strong> {book.status}
       </p>
       <p>
-        <strong>Available Copies:</strong> {book.available_copies}
+        <strong>Location:</strong> {book.location_section} / Shelf{" "}
+        {book.location_shelf}, Row {book.location_row}
       </p>
     </div>
   );

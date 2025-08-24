@@ -35,28 +35,43 @@ INSERT IGNORE INTO librarians (user_id, full_name) VALUES
 -- ----------------
 -- BOOKS (novels)
 -- ----------------
-INSERT IGNORE INTO books (title, author, isbn, published_year, category, total_copies, available_copies, status) VALUES
-('Of Mice and Men', 'John Steinbeck', '9780140177398', 1937, 'Novel', 3, 2, 'Borrowed'),
-('To Kill A Mockingbird', 'Harper Lee', '9780061120084', 1960, 'Novel', 2, 1, 'Reserved'),
-('Pride and Prejudice', 'Jane Austen', '9780141439518', 1813, 'Novel', 5, 5, 'Available'),
-('Great Expectations', 'Charles Dickens', '9780141439563', 1861, 'Novel', 4, 4, 'Available'),
-('Moby-Dick', 'Herman Melville', '9780142437247', 1851, 'Novel', 3, 3, 'Available'),
-('Jane Eyre', 'Charlotte Bronte', '9780142437209', 1847, 'Novel', 3, 3, 'Available'),
-('Wuthering Heights', 'Emily Bronte', '9780141439556', 1847, 'Novel', 3, 3, 'Available'),
-('1984', 'George Orwell', '9780451524935', 1949, 'Novel', 6, 6, 'Available'),
-('Animal Farm', 'George Orwell', '9780451526342', 1945, 'Novel', 5, 5, 'Available'),
-('Frankenstein', 'Mary Shelley', '9780141439471', 1818, 'Novel', 2, 2, 'Available');
+-- ----------------
+-- BOOKS SEEDING
+-- ----------------
 
--- ----------------
--- BOOKS (National Geographic Magazines)
--- ----------------
-INSERT IGNORE INTO books (title, author, isbn, published_year, category, total_copies, available_copies, status, location_section, location_shelf, location_row) VALUES
+INSERT IGNORE INTO books 
+(title, author, isbn, published_year, category, total_copies, available_copies, status, location_section, location_shelf, location_row) VALUES
+
+-- Novels
+('Of Mice and Men', 'John Steinbeck', '9780140177398', 1937, 'Novel', 3, 2, 'Borrowed', 'Fiction', 1, 1),
+('To Kill A Mockingbird', 'Harper Lee', '9780061120084', 1960, 'Novel', 2, 1, 'Reserved', 'Fiction', 1, 2),
+('Pride and Prejudice', 'Jane Austen', '9780141439518', 1813, 'Novel', 5, 5, 'Available', 'Fiction', 1, 3),
+('Great Expectations', 'Charles Dickens', '9780141439563', 1861, 'Novel', 4, 4, 'Available', 'Fiction', 1, 4),
+('Moby-Dick', 'Herman Melville', '9780142437247', 1851, 'Novel', 3, 3, 'Available', 'Fiction', 1, 5),
+('Jane Eyre', 'Charlotte Bronte', '9780142437209', 1847, 'Novel', 3, 3, 'Available', 'Fiction', 1, 6),
+('Wuthering Heights', 'Emily Bronte', '9780141439556', 1847, 'Novel', 3, 3, 'Available', 'Fiction', 2, 1),
+('1984', 'George Orwell', '9780451524935', 1949, 'Novel', 6, 6, 'Available', 'Fiction', 2, 2),
+('Animal Farm', 'George Orwell', '9780451526342', 1945, 'Novel', 5, 5, 'Available', 'Fiction', 2, 3),
+('Frankenstein', 'Mary Shelley', '9780141439471', 1818, 'Novel', 2, 2, 'Available', 'Fiction', 2, 4),
+
+-- Magazines
 ('National Geographic - January 2021', 'National Geographic Society', '978NG2021010', 2021, 'Magazine', 3, 3, 'Available', 'Magazines', 1, 1),
 ('National Geographic - February 2021', 'National Geographic Society', '978NG2021020', 2021, 'Magazine', 3, 3, 'Available', 'Magazines', 1, 2),
 ('National Geographic - March 2021', 'National Geographic Society', '978NG2021030', 2021, 'Magazine', 3, 3, 'Available', 'Magazines', 1, 3),
 ('National Geographic - April 2022', 'National Geographic Society', '978NG2022040', 2022, 'Magazine', 3, 3, 'Available', 'Magazines', 1, 4),
 ('National Geographic - May 2022', 'National Geographic Society', '978NG2022050', 2022, 'Magazine', 3, 3, 'Available', 'Magazines', 1, 5),
-('National Geographic - June 2023', 'National Geographic Society', '978NG2023060', 2023, 'Magazine', 3, 3, 'Available', 'Magazines', 1, 6);
+('National Geographic - June 2023', 'National Geographic Society', '978NG2023060', 2023, 'Magazine', 3, 3, 'Available', 'Magazines', 1, 6),
+
+-- Reference / Misc
+('Encyclopedia Britannica - 2020 Edition', 'Encyclopedia Britannica', '978EB2020001', 2020, 'Reference', 2, 2, 'Available', 'Reference', 1, 1),
+('Python Programming 101', 'Guido van Rossum', '978PY2021001', 2021, 'Education', 4, 4, 'Available', 'Education', 2, 1),
+('Data Structures & Algorithms', 'Robert Lafore', '978DSA2021001', 2019, 'Education', 3, 3, 'Available', 'Education', 2, 2),
+('Cooking Made Easy', 'Jamie Oliver', '978COOK2020001', 2020, 'Cooking', 5, 5, 'Available', 'Lifestyle', 1, 1),
+('Gardening for Beginners', 'Alan Titchmarsh', '978GARD2021001', 2021, 'Lifestyle', 4, 4, 'Available', 'Lifestyle', 1, 2);
+
+
+
+
 
 -- ----------------
 -- LOANS
@@ -68,8 +83,8 @@ INSERT IGNORE INTO loans (member_id, book_id, loan_date, due_date, return_date, 
 -- RESERVATIONS
 -- ----------------
 INSERT IGNORE INTO reservations (member_id, book_id, reservation_date, status) VALUES
-(1, 2, '2025-08-15 10:00:00', 'Waiting'),
-(2, 2, '2025-08-10 09:00:00', 'Waiting');
+(1, 2, '2025-08-22 10:00:00', 'Waiting'),
+(2, 2, '2025-08-23 09:00:00', 'Waiting');
 
 -- ----------------
 -- FINES

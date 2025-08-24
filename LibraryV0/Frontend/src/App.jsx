@@ -7,7 +7,7 @@ import MemberDashboard from "./pages/MemberDashboard";
 import LibrarianDashboard from "./pages/LibrarianDashboard";
 import PrivateRoute from "./components/PrivateRoute";
 
-function App() {
+const App = () => {
   return (
     <AuthProvider>
       <Router>
@@ -34,6 +34,6 @@ function App() {
       </Router>
     </AuthProvider>
   );
-}
+};
 
 export default App;

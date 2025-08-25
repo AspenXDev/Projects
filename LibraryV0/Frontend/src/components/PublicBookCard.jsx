@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function PublicBookCard({ book }) {
+export const PublicBookCard = ({ book }) => {
   // Support both camelCase and snake_case from API
   const available = book.availableCopies ?? book.available_copies ?? 0;
   const status = book.status ?? "Unknown";
@@ -33,4 +33,4 @@ export default function PublicBookCard({ book }) {
       </div>
     </article>
   );
-}
+};

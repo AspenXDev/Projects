@@ -1,22 +1,34 @@
-import { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
+import * as AuthService from "../services/AuthService";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  // Load role from localStorage on app start
   useEffect(() => {
+    const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-    if (role) setUser({ role });
+    if (token && role) {
+      setUser({ token, role });
+    }
   }, []);
 
-  const login = (role) => {
-    localStorage.setItem("role", role);
-    setUser({ role });
+  const login = async (username, password) => {
+    try {
+      const { token, role } = await AuthService.login(username, password);
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", role);
+      setUser({ token, role });
+      return role; // ✅ returns role to caller
+    } catch (err) {
+      console.error("AuthContext login error:", err);
+      throw err;
+    }
   };
 
   const logout = () => {
+    localStorage.removeItem("token");
     localStorage.removeItem("role");
     setUser(null);
   };
@@ -27,3 +39,5 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+export const useAuth = () => useContext(AuthContext);

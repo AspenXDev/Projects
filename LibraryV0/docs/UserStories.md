@@ -1,8 +1,8 @@
-## Role: Member
+## Role: Public User (no auth required, authenticated Member and Librarian inclusive)
 
 ### 1. Search for a Book
 
-> As a `Member`,
+> As a `Public User`,
 > I want to search for a book by title, author, or ISBN,
 > so that I can find the book I’m interested in.
 
@@ -18,9 +18,9 @@ Acceptance Criteria:
 
 ### 2. View Book Details
 
-> As a `Member`,
+> As a `Public User`,
 > I want to view full details of a book,
-> so that I can decide whether to borrow or reserve it.
+> so that I can decide whether to become a reader to borrow or reserve it.
 
 Acceptance Criteria:
 
@@ -29,7 +29,22 @@ Acceptance Criteria:
 - Shelf location is shown if available.
 - Expected return date is shown if on loan.
 
+### 3. Register as Member
+
+> As a `Public User`,
+> I want to register myself as a member of the library,
+> so that I can borrow the books and materials from the library.
+
+Acceptance Criteria:
+
+- On-screen confirmation shows success of account creation awaiting Librarian confirmation.
+- User details and credentials are stored (Password is hashed).
+- Fines, reservations, loans are not created.
+- .
+
 ---
+
+## Role: Member (authenticated Member with valid JWT and authorized for Member only)
 
 ### 3. Borrow a Book
 
@@ -135,7 +150,7 @@ Acceptance Criteria:
 
 ---
 
-### 10. Receive Notifications
+### 10. Receive Notifications (Scoped out due to constraints)
 
 > As a `Member`,
 > I want on-screen notifications for due dates, overdue books, and reservations,
@@ -150,7 +165,7 @@ Acceptance Criteria:
 
 ---
 
-## Role: Librarian
+## Role: Librarian (authenticated Librarian with valid JWT and authorized for all Members with all Member privileges too)
 
 ### 11. Add a New Book
 
@@ -194,19 +209,6 @@ Acceptance Criteria:
 
 ---
 
-### 14. Manage Categories and Material Types
-
-> As a `Librarian`,
-> I want to add, edit, or delete categories/material types,
-> so that books are organized for easier discovery.
-
-Acceptance Criteria:
-
-- Updated categories/material types appear in search filters.
-- Deleting a category reassigns affected books to “Uncategorized.”
-
----
-
 ### 15. Manage Borrowing & Returns
 
 > As a `Librarian`,
@@ -219,5 +221,19 @@ Acceptance Criteria:
 - Overdue fines calculated automatically.
 - Renewals handled according to rules.
 - Reservation queues managed properly.
+
+---
+
+### 16. Manage Members
+
+> As a `Librarian`,
+> I want to create new members, review all members' information, update details of public users' application after confirmation, and delete dormant accounts,
+> so that the library can manage its users.
+
+Acceptance Criteria:
+
+- Can process detail change for any member.
+- Can set account.status to active for any new member applications from public users.
+- Users.UpdatedAt is set to now each time a change is made.
 
 ---

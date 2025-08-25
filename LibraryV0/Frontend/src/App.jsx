@@ -12,8 +12,13 @@ const App = () => {
     <AuthProvider>
       <Router>
         <Routes>
+          {/* Public landing page with infinite scroll + login option */}
           <Route path="/" element={<LandingPage />} />
+
+          {/* Dedicated login page (still available if user prefers) */}
           <Route path="/login" element={<LoginPage />} />
+
+          {/* Member-only dashboard */}
           <Route
             path="/member-dashboard"
             element={
@@ -22,6 +27,8 @@ const App = () => {
               </PrivateRoute>
             }
           />
+
+          {/* Librarian-only dashboard */}
           <Route
             path="/librarian-dashboard"
             element={

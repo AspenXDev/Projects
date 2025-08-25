@@ -7,7 +7,7 @@ import { MemberDashboard } from "./pages/MemberDashboard";
 import { LibrarianDashboard } from "./pages/LibrarianDashboard";
 import { PrivateRoute } from "./components/PrivateRoute";
 
-export const App = () => {
+export function App() {
   return (
     <AuthProvider>
       <Router>
@@ -17,7 +17,7 @@ export const App = () => {
           <Route
             path="/member-dashboard"
             element={
-              <PrivateRoute roles={["member"]}>
+              <PrivateRoute roles={["members"]}>
                 <MemberDashboard />
               </PrivateRoute>
             }
@@ -25,7 +25,7 @@ export const App = () => {
           <Route
             path="/librarian-dashboard"
             element={
-              <PrivateRoute roles={["librarian"]}>
+              <PrivateRoute roles={["librarians"]}>
                 <LibrarianDashboard />
               </PrivateRoute>
             }
@@ -34,4 +34,4 @@ export const App = () => {
       </Router>
     </AuthProvider>
   );
-};
+}

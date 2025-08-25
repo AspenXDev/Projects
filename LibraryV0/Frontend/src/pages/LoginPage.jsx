@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
-export const LoginPage = () => {
+export function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -19,17 +19,12 @@ export const LoginPage = () => {
     try {
       const role = await login(username, password);
 
-      // Normalize role
-      const r = (role || "").toLowerCase();
-      if (r.startsWith("librar")) {
-        navigate("/librarian-dashboard");
-      } else if (r.startsWith("member")) {
-        navigate("/member-dashboard");
-      } else {
-        navigate("/");
-      }
+      // navigate based on normalized role
+      if (role === "librarians") navigate("/librarian-dashboard");
+      else if (role === "members") navigate("/member-dashboard");
+      else navigate("/");
     } catch (err) {
-      console.error("LoginPage error:", err);
+      console.error(err);
       setError(err.message || "Login failed");
     } finally {
       setLoading(false);
@@ -50,7 +45,6 @@ export const LoginPage = () => {
             style={{ width: "100%" }}
           />
         </div>
-
         <div style={{ marginBottom: 12 }}>
           <label>Password:</label>
           <input
@@ -61,13 +55,11 @@ export const LoginPage = () => {
             style={{ width: "100%" }}
           />
         </div>
-
         {error && <p style={{ color: "red" }}>{error}</p>}
-
         <button type="submit" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>
     </div>
   );
-};
+}

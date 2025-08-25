@@ -1,37 +1,73 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 
-const LoginPage = () => {
-  const [role, setRole] = useState("member");
+export const LoginPage = () => {
+  const { login } = useAuth();
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
 
-  const handleLogin = () => {
-    login(role);
-    navigate(role === "member" ? "/member-dashboard" : "/librarian-dashboard");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const role = await login(username, password);
+
+      // Normalize role
+      const r = (role || "").toLowerCase();
+      if (r.startsWith("librar")) {
+        navigate("/librarian-dashboard");
+      } else if (r.startsWith("member")) {
+        navigate("/member-dashboard");
+      } else {
+        navigate("/");
+      }
+    } catch (err) {
+      console.error("LoginPage error:", err);
+      setError(err.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <h1>Login</h1>
-      <select value={role} onChange={(e) => setRole(e.target.value)}>
-        <option value="member">Member</option>
-        <option value="librarian">Librarian</option>
-      </select>
-      <button onClick={handleLogin} style={{ marginTop: "1rem" }}>
-        Login
-      </button>
+    <div className="login-container" style={{ padding: 20, maxWidth: 420 }}>
+      <h2>Login</h2>
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: 12 }}>
+          <label>Username:</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            style={{ width: "100%" }}
+          />
+        </div>
+
+        <div style={{ marginBottom: 12 }}>
+          <label>Password:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{ width: "100%" }}
+          />
+        </div>
+
+        {error && <p style={{ color: "red" }}>{error}</p>}
+
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
+      </form>
     </div>
   );
 };
-
-export default LoginPage;

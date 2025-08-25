@@ -1,12 +1,13 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { PublicBookCard } from "../components/PublicBookCard";
 import "../styling/LandingPage.css";
-import PublicBookCard from "../components/PublicBookCard";
 
-const PAGE_SIZE = 12; // front-end mock pagination size
+const PAGE_SIZE = 12;
 
-export default function LandingPage() {
-  // books
+export const LandingPage = () => {
   const [allBooks, setAllBooks] = useState([]);
   const [visibleBooks, setVisibleBooks] = useState([]);
   const [page, setPage] = useState(0);
@@ -14,14 +15,16 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // auth drawer
   const [showAuth, setShowAuth] = useState(false);
-  const [authMode, setAuthMode] = useState("login"); // "login" | "register"
+  const [authMode, setAuthMode] = useState("login");
 
-  // loader ref for IntersectionObserver
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const loaderRef = useRef(null);
 
-  // fetch all books once (public endpoint)
+  // -------------------
+  // FETCH BOOKS
+  // -------------------
   const fetchAllBooks = useCallback(async () => {
     try {
       setLoading(true);
@@ -29,12 +32,11 @@ export default function LandingPage() {
       const res = await axios.get("http://localhost:8081/books");
       const data = Array.isArray(res.data) ? res.data : [];
       setAllBooks(data);
-      const initial = data.slice(0, PAGE_SIZE);
-      setVisibleBooks(initial);
+      setVisibleBooks(data.slice(0, PAGE_SIZE));
       setPage(1);
       setHasMore(data.length > PAGE_SIZE);
-    } catch (e) {
-      console.error(e);
+    } catch (err) {
+      console.error("Books fetch error:", err);
       setError("Unable to load books.");
     } finally {
       setLoading(false);
@@ -45,81 +47,80 @@ export default function LandingPage() {
     fetchAllBooks();
   }, [fetchAllBooks]);
 
-  // load more (front-end slice)
+  // -------------------
+  // INFINITE SCROLL
+  // -------------------
   const loadMore = useCallback(() => {
     if (!hasMore || loading) return;
-
     setPage((prev) => {
       const nextPage = prev + 1;
-      const nextItems = allBooks.slice(0, nextPage * PAGE_SIZE);
-      setVisibleBooks(nextItems);
+      setVisibleBooks(allBooks.slice(0, nextPage * PAGE_SIZE));
       if (nextPage * PAGE_SIZE >= allBooks.length) setHasMore(false);
       return nextPage;
     });
   }, [allBooks, hasMore, loading]);
 
-  // IntersectionObserver (eslint-friendly cleanup)
   useEffect(() => {
     const loader = loaderRef.current;
     if (!loader) return;
-
     const observer = new IntersectionObserver(
       (entries) => {
-        const first = entries[0];
-        if (first.isIntersecting) {
-          loadMore();
-        }
+        if (entries[0].isIntersecting) loadMore();
       },
       { root: null, rootMargin: "200px", threshold: 0.1 }
     );
-
     observer.observe(loader);
-    return () => {
-      if (loader) observer.unobserve(loader);
-    };
+    return () => loader && observer.unobserve(loader);
   }, [loadMore]);
 
-  // mock submit handlers (front-end only for now)
-  const handleLoginSubmit = (e) => {
+  // -------------------
+  // HANDLE LOGIN
+  // -------------------
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    // TODO: wire to real login later
-    console.log("Login submit (mock)");
-    setShowAuth(false);
+    const username = e.target.username.value;
+    const password = e.target.password.value;
+
+    try {
+      const role = await login(username, password);
+      setShowAuth(false);
+
+      const r = (role || "").toLowerCase();
+      if (r.startsWith("librar")) navigate("/librarian-dashboard");
+      else if (r.startsWith("member")) navigate("/member-dashboard");
+      else navigate("/");
+    } catch (err) {
+      console.error("Login failed:", err);
+      alert(err.message || "Invalid username or password");
+    }
   };
 
   const handleRegisterSubmit = (e) => {
     e.preventDefault();
-    // TODO: wire to real register later
-    // Role = 1 (Members), is_active = false will be enforced on backend.
-    console.log("Register submit (mock)");
     setShowAuth(false);
+    alert("Registration not implemented yet.");
   };
 
+  // -------------------
+  // RENDER
+  // -------------------
   return (
     <div className="landing-page">
-      {/* top bar */}
       <header className="landing-topbar">
         <h1 className="landing-title">Library</h1>
-        <button
-          className="auth-toggle-btn"
-          onClick={() => setShowAuth(true)}
-          aria-label="Open login/register"
-        >
+        <button className="auth-toggle-btn" onClick={() => setShowAuth(true)}>
           Login / Register
         </button>
       </header>
 
-      {/* hero */}
       <section className="landing-hero">
         <h2>Explore our collection</h2>
         <p>Browse books and magazines. Scroll to load more.</p>
       </section>
 
-      {/* content */}
       <main className="cards-wrap">
         {error && <p className="error">{error}</p>}
-        {!error && loading && <p className="muted">Loading…</p>}
-
+        {loading && <p className="muted">Loading…</p>}
         {!loading && !error && visibleBooks.length === 0 && (
           <p className="muted">No books available.</p>
         )}
@@ -130,17 +131,15 @@ export default function LandingPage() {
           ))}
         </div>
 
-        {/* sentinel for infinite scroll */}
         <div ref={loaderRef} className="infinite-loader">
           {hasMore ? "Loading more…" : "— End of list —"}
         </div>
       </main>
 
-      {/* auth drawer (hidden by default) */}
       {showAuth && (
         <>
           <div className="auth-backdrop" onClick={() => setShowAuth(false)} />
-          <aside className="auth-panel" role="dialog" aria-modal="true">
+          <aside className="auth-panel" role="dialog">
             <div className="auth-header">
               <button
                 className={`auth-tab ${authMode === "login" ? "active" : ""}`}
@@ -156,11 +155,7 @@ export default function LandingPage() {
               >
                 Create Account
               </button>
-              <button
-                className="auth-close"
-                onClick={() => setShowAuth(false)}
-                aria-label="Close"
-              >
+              <button className="auth-close" onClick={() => setShowAuth(false)}>
                 ✕
               </button>
             </div>
@@ -169,11 +164,11 @@ export default function LandingPage() {
               <form className="auth-form" onSubmit={handleLoginSubmit}>
                 <label>
                   Username
-                  <input type="text" required />
+                  <input name="username" type="text" required />
                 </label>
                 <label>
                   Password
-                  <input type="password" required />
+                  <input name="password" type="password" required />
                 </label>
                 <button type="submit" className="primary-btn">
                   Login
@@ -197,13 +192,10 @@ export default function LandingPage() {
                   Password
                   <input type="password" required />
                 </label>
-
-                {/* Front-end note: role_id = 1 (Members), is_active = false */}
                 <div className="hint">
                   New accounts are created as <b>Members</b> and marked{" "}
-                  <b>inactive</b> until a Librarian approves.
+                  <b>inactive</b> until approved.
                 </div>
-
                 <button type="submit" className="primary-btn">
                   Create Account
                 </button>
@@ -214,4 +206,4 @@ export default function LandingPage() {
       )}
     </div>
   );
-}
+};

@@ -1,15 +1,41 @@
-import { Link } from "react-router-dom";
+import React from "react";
+import { useAuth } from "../contexts/AuthContext";
 
-export default function Navbar() {
+export function Navbar({ currentPage }) {
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    window.location.href = "/login"; // redirect to login
+  };
+
   return (
-    <nav style={{ padding: "1rem", borderBottom: "1px solid #ccc" }}>
-      <Link to="/" style={{ marginRight: "1rem" }}>
-        Dashboard
-      </Link>
-      <Link to="/books" style={{ marginRight: "1rem" }}>
-        Books
-      </Link>
-      <Link to="/members">Members</Link>
+    <nav
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "10px 20px",
+        backgroundColor: "#333",
+        color: "#fff",
+      }}
+    >
+      <div>
+        <strong>{user?.username || "User"}</strong> | {currentPage}
+      </div>
+      <button
+        onClick={handleLogout}
+        style={{
+          backgroundColor: "#ff4d4f",
+          color: "#fff",
+          border: "none",
+          padding: "5px 12px",
+          borderRadius: 4,
+          cursor: "pointer",
+        }}
+      >
+        Logout
+      </button>
     </nav>
   );
 }

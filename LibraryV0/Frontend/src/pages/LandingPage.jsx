@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import axios from "axios";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { PublicBookCard } from "../components/PublicBookCard";
+import { login as loginService } from "../services/AuthService";
 import "../styling/LandingPage.css";
+import { PublicBookCard } from "../components/PublicBookCard";
+import axios from "axios";
 
 const PAGE_SIZE = 12;
 
@@ -22,9 +23,7 @@ export const LandingPage = () => {
   const navigate = useNavigate();
   const loaderRef = useRef(null);
 
-  // -------------------
-  // FETCH BOOKS
-  // -------------------
+  // Fetch all books
   const fetchAllBooks = useCallback(async () => {
     try {
       setLoading(true);
@@ -35,8 +34,8 @@ export const LandingPage = () => {
       setVisibleBooks(data.slice(0, PAGE_SIZE));
       setPage(1);
       setHasMore(data.length > PAGE_SIZE);
-    } catch (err) {
-      console.error("Books fetch error:", err);
+    } catch (e) {
+      console.error(e);
       setError("Unable to load books.");
     } finally {
       setLoading(false);
@@ -47,9 +46,7 @@ export const LandingPage = () => {
     fetchAllBooks();
   }, [fetchAllBooks]);
 
-  // -------------------
-  // INFINITE SCROLL
-  // -------------------
+  // Load more for infinite scroll
   const loadMore = useCallback(() => {
     if (!hasMore || loading) return;
     setPage((prev) => {
@@ -70,40 +67,37 @@ export const LandingPage = () => {
       { root: null, rootMargin: "200px", threshold: 0.1 }
     );
     observer.observe(loader);
-    return () => loader && observer.unobserve(loader);
+    return () => {
+      if (loader) observer.unobserve(loader);
+    };
   }, [loadMore]);
 
-  // -------------------
-  // HANDLE LOGIN
-  // -------------------
+  // Handle login from modal
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    const username = e.target.username.value;
-    const password = e.target.password.value;
+    const username = e.target[0].value;
+    const password = e.target[1].value;
 
     try {
       const role = await login(username, password);
       setShowAuth(false);
 
-      const r = (role || "").toLowerCase();
-      if (r.startsWith("librar")) navigate("/librarian-dashboard");
-      else if (r.startsWith("member")) navigate("/member-dashboard");
-      else navigate("/");
+      if (role?.toLowerCase().startsWith("librar")) {
+        navigate("/librarian-dashboard");
+      } else {
+        navigate("/member-dashboard");
+      }
     } catch (err) {
-      console.error("Login failed:", err);
-      alert(err.message || "Invalid username or password");
+      console.error(err);
+      alert("Invalid username or password");
     }
   };
 
   const handleRegisterSubmit = (e) => {
     e.preventDefault();
     setShowAuth(false);
-    alert("Registration not implemented yet.");
   };
 
-  // -------------------
-  // RENDER
-  // -------------------
   return (
     <div className="landing-page">
       <header className="landing-topbar">
@@ -164,11 +158,11 @@ export const LandingPage = () => {
               <form className="auth-form" onSubmit={handleLoginSubmit}>
                 <label>
                   Username
-                  <input name="username" type="text" required />
+                  <input type="text" required />
                 </label>
                 <label>
                   Password
-                  <input name="password" type="password" required />
+                  <input type="password" required />
                 </label>
                 <button type="submit" className="primary-btn">
                   Login

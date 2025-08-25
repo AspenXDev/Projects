@@ -3,14 +3,14 @@ import { useAuth } from "../contexts/AuthContext";
 import { Navbar } from "../components/Navbar";
 
 export function LibrarianDashboard() {
-  const { user } = useAuth(); // <-- get the user
+  const { user } = useAuth();
 
   return (
     <div>
       <Navbar currentPage="Librarian Dashboard" />
       <div style={{ padding: 20 }}>
         <h3>{user?.username || "Librarian"}, welcome to your dashboard!</h3>
-        {/* Other librarian-specific content */}
+        {/* Add more librarian-specific content*/}
       </div>
     </div>
   );

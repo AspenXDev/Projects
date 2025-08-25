@@ -1,14 +1,7 @@
 import React from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { LogOutButton } from "./LogOutButton";
 
 export function Navbar({ currentPage }) {
-  const { user, logout } = useAuth();
-
-  const handleLogout = () => {
-    logout();
-    window.location.href = "/login"; // redirect to login
-  };
-
   return (
     <nav
       style={{
@@ -16,26 +9,16 @@ export function Navbar({ currentPage }) {
         justifyContent: "space-between",
         alignItems: "center",
         padding: "10px 20px",
-        backgroundColor: "#333",
-        color: "#fff",
+        backgroundColor: "#f5f5f5",
+        borderBottom: "1px solid #ddd",
       }}
     >
       <div>
-        <strong>{user?.username || "User"}</strong> | {currentPage}
+        <strong>{currentPage}</strong>
       </div>
-      <button
-        onClick={handleLogout}
-        style={{
-          backgroundColor: "#ff4d4f",
-          color: "#fff",
-          border: "none",
-          padding: "5px 12px",
-          borderRadius: 4,
-          cursor: "pointer",
-        }}
-      >
-        Logout
-      </button>
+      <div>
+        <LogOutButton />
+      </div>
     </nav>
   );
 }

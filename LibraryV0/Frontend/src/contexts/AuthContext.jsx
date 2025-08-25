@@ -1,3 +1,4 @@
+// src/contexts/AuthContext.jsx
 import React, { createContext, useContext, useState } from "react";
 import * as AuthService from "../services/AuthService";
 
@@ -9,18 +10,35 @@ export function AuthProvider({ children }) {
     return saved ? JSON.parse(saved) : null;
   });
 
+  // Login function
   const login = async (username, password) => {
-    const data = await AuthService.login(username, password);
-    const normalizedRole = data.role.toLowerCase(); // "members" or "librarians"
-    const newUser = { token: data.token, role: normalizedRole, username };
-    setUser(newUser);
-    localStorage.setItem("user", JSON.stringify(newUser));
-    return normalizedRole;
+    try {
+      const data = await AuthService.login(username, password);
+
+      const newUser = {
+        token: data.token,
+        role: data.role.toLowerCase(), // "members" or "librarians"
+        username, // store input username
+        user_id: null, // backend doesn’t return this yet
+      };
+
+      setUser(newUser);
+      localStorage.setItem("user", JSON.stringify(newUser));
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", newUser.role);
+
+      return newUser.role;
+    } catch (err) {
+      console.error("AuthContext.login error:", err);
+      throw err;
+    }
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
   };
 
   return (

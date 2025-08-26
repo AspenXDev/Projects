@@ -3,8 +3,8 @@
 ### 1. Search for a Book
 
 > As a `Public User`,
-> I want to search for a book by title, author, or ISBN,
-> so that I can find the book I’m interested in.
+> I want to browse books and their details,
+> so that I can find the book I’m interested in and register as usr .
 
 Acceptance Criteria:
 

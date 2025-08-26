@@ -1,39 +1,53 @@
+// MapperFactory.java
 package com.library.lms.mapper;
 
+import com.library.lms.dto.UserDTO;
 import com.library.lms.model.Librarian;
 import com.library.lms.model.Member;
 import com.library.lms.model.Role;
 import com.library.lms.model.User;
 
+import java.time.LocalDateTime;
+
+/**
+ * Provides factory methods for creating core entities.
+ * Note: More complex entity creation logic (like fetching roles from DB) should typically reside in a service layer.
+ */
 public class MapperFactory {
 
-    public static User createUser(String username, String email, String passwordHash, String roleName) {
+    /**
+     * Creates a new {@link User} entity with basic details.
+     * This method assumes a {@code roleId} is provided, and a {@link Role} object is created
+     * with just the ID. The actual {@link Role} entity should be fetched from the database
+     * and set by the service layer before persisting the {@link User}.
+     *
+     * @param username The username for the new user.
+     * @param email The email for the new user.
+     * @param passwordHash The hashed password for the new user.
+     * @param roleId The ID of the role for the new user.
+     * @return A new User entity.
+     */
+    public static User createUser(String username, String email, String passwordHash, Integer roleId) {
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
         user.setPasswordHash(passwordHash);
-        user.setIsActive(true);
-        user.setRole(new Role(roleName));
+        user.setIsActive(true); // Default to active
+
+        if (roleId != null) {
+            Role role = new Role();
+            role.setRoleId(roleId);
+            // In a real application, you'd fetch the Role entity from a repository:
+            // Role role = roleRepository.findById(roleId).orElseThrow(() -> new EntityNotFoundException("Role not found"));
+            user.setRole(role);
+        }
+        // created_at and updated_at are set by the database
         return user;
     }
 
-    public static Member toMember(Member member) {
-        User user = createUser(
-                member.getFullName().toLowerCase().replaceAll("\\s+", ""),
-                member.getUser() != null ? member.getUser().getEmail() : "",
-                member.getUser() != null ? member.getUser().getPasswordHash() : "",
-                "members"
-        );
-        return MemberMapper.toEntityWithUser(member, user);
-    }
-
-    public static Librarian toLibrarian(Librarian librarian) {
-        User user = createUser(
-                librarian.getFullName().toLowerCase().replaceAll("\\s+", ""),
-                librarian.getUser() != null ? librarian.getUser().getEmail() : "",
-                librarian.getUser() != null ? librarian.getUser().getPasswordHash() : "",
-                "librarians"
-        );
-        return LibrarianMapper.toEntityWithUser(librarian, user);
-    }
+    // Removed the toMember(Member member) and toLibrarian(Librarian librarian) methods
+    // from MapperFactory. These methods had complex logic for creating users and
+    // associating roles based on full names, which is better suited for a dedicated
+    // user/member/librarian registration service. Mappers should primarily focus on
+    // converting between DTOs and entities.
 }

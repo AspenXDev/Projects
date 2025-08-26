@@ -1,6 +1,6 @@
 ---
 # EndPoints
-
+Start with http://localhost:8081/
 ## 1. Legend
 
 | Term              | Meaning                                                                                      |

@@ -1,11 +1,13 @@
 package com.library.lms.controller;
 
+import com.library.lms.auth.CustomUserDetails;
 import com.library.lms.auth.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -34,19 +36,28 @@ public class AuthController {
 
         try {
             Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.username, req.password)
+                    new UsernamePasswordAuthenticationToken(req.username, req.password)
             );
 
-            String token = jwtUtil.generateToken(auth.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails
-                    ? (org.springframework.security.core.userdetails.UserDetails) auth.getPrincipal()
-                    : null);
+            if (!(auth.getPrincipal() instanceof CustomUserDetails)) {
+                return ResponseEntity.internalServerError().body(Map.of(
+                        "error", "Internal Error",
+                        "message", "Unexpected principal type"
+                ));
+            }
 
-            return ResponseEntity.ok(Map.of("message", "Login successful", "token", token));
+            CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+            String token = jwtUtil.generateToken(userDetails);
+
+            return ResponseEntity.ok(Map.of(
+                    "token", token,
+                    "role", userDetails.getUser().getRole().getRoleName()
+            ));
 
         } catch (BadCredentialsException ex) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Bad Request", "message", "Bad credentials"));
-        } catch (Exception ex) {
-            return ResponseEntity.internalServerError().body(Map.of("error", "Internal Server Error", "message", ex.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Bad credentials"
+            ));
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.library.lms.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -23,6 +25,12 @@ public class User {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
+    @Column(name = "created_at", insertable = false, updatable = false, nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", insertable = false, updatable = false, nullable = false)
+    private LocalDateTime updatedAt;
+    
     @ManyToOne(fetch = FetchType.EAGER) // role_id foreign key
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;

@@ -1,14 +1,13 @@
 package com.library.lms.service.impl;
 
-import java.util.List;
-
+import com.library.lms.model.Reservation;
+import com.library.lms.repository.ReservationRepository;
+import com.library.lms.service.ReservationService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.library.lms.model.Reservation;
-import com.library.lms.model.enums.ReservationStatus;
-import com.library.lms.repository.ReservationRepository;
-import com.library.lms.service.ReservationService;
+import java.util.List;
 
 @Service
 @Transactional
@@ -26,41 +25,43 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public Reservation getReservationById(Integer reservationId) {
-        return reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + reservationId));
+    public Reservation updateReservation(Integer reservationId, Reservation reservation) {
+        Reservation existing = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new EntityNotFoundException("Reservation not found: " + reservationId));
+        existing.setReservationDate(reservation.getReservationDate());
+        existing.setExpiryDate(reservation.getExpiryDate());
+        existing.setBook(reservation.getBook());
+        existing.setMember(reservation.getMember());
+        return reservationRepository.save(existing);
     }
 
     @Override
+    public void deleteReservation(Integer reservationId) {
+        reservationRepository.delete(getReservationById(reservationId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Reservation getReservationById(Integer reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new EntityNotFoundException("Reservation not found: " + reservationId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Reservation> getAllReservations() {
         return reservationRepository.findAll();
     }
 
     @Override
-    public List<Reservation> getReservationsByStatus(ReservationStatus status) {
-        return reservationRepository.findByStatus(status);
-    }
-
-    @Override
-    public List<Reservation> getReservationsByMemberId(Integer memberId) {
-        return reservationRepository.findByMemberMemberId(memberId);
-    }
-
-    @Override
+    @Transactional(readOnly = true)
     public List<Reservation> getReservationsByBookId(Integer bookId) {
         return reservationRepository.findByBookBookId(bookId);
     }
 
     @Override
-    public Reservation updateReservation(Reservation reservation) {
-        if (reservation.getReservationId() == null) {
-            throw new IllegalArgumentException("Reservation ID must not be null for update");
-        }
-        return reservationRepository.save(reservation);
-    }
-
-    @Override
-    public void deleteReservation(Integer reservationId) {
-        reservationRepository.deleteById(reservationId);
+    @Transactional(readOnly = true)
+    public List<Reservation> getReservationsByMemberId(Integer memberId) {
+        return reservationRepository.findByMemberMemberId(memberId);
     }
 }

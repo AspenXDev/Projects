@@ -1,67 +1,72 @@
 package com.library.lms.service.impl;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.library.lms.model.User;
+import com.library.lms.mapper.UserMapper;
 import com.library.lms.repository.UserRepository;
 import com.library.lms.service.UserService;
+import com.library.lms.dto.UserDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     @Override
-    public User createUser(User user) {
-        return userRepository.save(user);
+    public UserDTO createUser(UserDTO userDTO) {
+        User user = userMapper.toEntity(userDTO);
+        return userMapper.toDTO(userRepository.save(user));
     }
 
     @Override
-    public User getUserById(Integer userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+    public UserDTO updateUser(Integer id, UserDTO userDTO) {
+        Optional<User> optional = userRepository.findById(id);
+        if (optional.isPresent()) {
+            User user = optional.get();
+            user.setUsername(userDTO.getUsername());
+            user.setPassword(userDTO.getPassword());
+            user.setRole(userDTO.getRole());
+            return userMapper.toDTO(userRepository.save(user));
+        }
+        return null;
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public void deleteUser(Integer id) {
+        userRepository.deleteById(id);
     }
 
     @Override
-    public User updateUser(Integer userId, User userDetails) {
-        User user = getUserById(userId);
-        user.setUsername(userDetails.getUsername());
-        user.setEmail(userDetails.getEmail());
-        user.setPasswordHash(userDetails.getPasswordHash());
-        user.setIsActive(userDetails.getIsActive());
-        user.setRole(userDetails.getRole());
-        return userRepository.save(user);
+    public UserDTO getUserById(Integer id) {
+        return userRepository.findById(id)
+                .map(userMapper::toDTO)
+                .orElse(null);
     }
 
     @Override
-    public void deleteUser(Integer userId) {
-        User user = getUserById(userId);
-        userRepository.delete(user);
+    public List<UserDTO> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(userMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public User getUserByUsername(String username) {
+    public UserDTO getUserByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
-    }
-
-    @Override
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+                .map(userMapper::toDTO)
+                .orElse(null);
     }
 }

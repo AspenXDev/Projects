@@ -15,18 +15,14 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    // Coursework secret; in production, move to config or environment variable
     private final String SECRET_KEY = "mySuperSecretKey1234567890!mySuperSecretKey1234567890!";
-
     private final long EXPIRATION_MS = 1000 * 60 * 60; // 1 hour
 
-    /** Generate JWT token for a user */
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userDetails.getUsername());
     }
 
-    /** Create JWT with claims and subject */
     private String createToken(Map<String, Object> claims, String subject) {
         Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
         return Jwts.builder()
@@ -38,17 +34,14 @@ public class JwtUtil {
                 .compact();
     }
 
-    /** Extract username from JWT */
     public String getUsernameFromToken(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    /** Validate token against user details */
     public boolean validateToken(String token, UserDetails userDetails) {
         return getUsernameFromToken(token).equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
-    /** Extract a claim using a resolver function */
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
         return claimsResolver.apply(
@@ -60,7 +53,6 @@ public class JwtUtil {
         );
     }
 
-    /** Check if token has expired */
     private boolean isTokenExpired(String token) {
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }

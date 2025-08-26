@@ -16,9 +16,12 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
     }
 
+    public User getUser() {
+        return user; // Expose User for role lookup
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Spring Security expects roles prefixed with "ROLE_"
         String roleName = user.getRole().getRoleName();
         return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + roleName));
     }

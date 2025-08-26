@@ -1,10 +1,15 @@
-// Deprecated. Normal entity used now.
-
+// UserDTO.java
 package com.library.lms.dto;
 
+import java.time.LocalDateTime;
+
 public record UserDTO(
-    Long id,
+    Integer userId,
     String username,
     String email,
-    String role
+    String passwordHash,
+    Integer roleId,
+    Boolean isActive, // Maps to 'is_active'
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt
 ) {}

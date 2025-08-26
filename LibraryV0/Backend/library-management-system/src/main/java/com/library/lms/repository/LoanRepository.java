@@ -1,19 +1,13 @@
 package com.library.lms.repository;
 
-import java.util.List;
-
+import com.library.lms.model.Loan;
+import com.library.lms.model.Loan.LoanStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.library.lms.model.Loan;
+import java.util.List;
 
 public interface LoanRepository extends JpaRepository<Loan, Integer> {
-
-    // Find all loans for a specific member
-    List<Loan> findByMember_MemberId(Integer memberId);
-
-    // Find all loans for a specific book
-    List<Loan> findByBook_BookId(Integer bookId);
-
-    // Find loans by status (Active, Returned)
-    List<Loan> findByStatus(Loan.LoanStatus status);
+    List<Loan> findByStatus(LoanStatus status);
+    List<Loan> findByMemberMemberId(Integer memberId);
+    List<Loan> findByBookBookId(Integer bookId);
 }

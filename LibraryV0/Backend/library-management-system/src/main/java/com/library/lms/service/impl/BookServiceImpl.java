@@ -1,7 +1,6 @@
 package com.library.lms.service.impl;
 
 import com.library.lms.model.Book;
-import com.library.lms.model.enums.BookStatus;
 import com.library.lms.repository.BookRepository;
 import com.library.lms.service.BookService;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,71 +21,50 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book createBook(Book book) {
-        normalizeCopies(book);
         return bookRepository.save(book);
     }
 
     @Override
-    public Book getBookById(Integer id) {
-        return bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Book not found with id: " + id));
+    public Book updateBook(Integer bookId, Book book) {
+        Book existing = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("Book not found: " + bookId));
+        existing.setTitle(book.getTitle());
+        existing.setAuthor(book.getAuthor());
+        existing.setPublisher(book.getPublisher());
+        existing.setIsbn(book.getIsbn());
+        existing.setYearPublished(book.getYearPublished());
+        existing.setGenre(book.getGenre());
+        existing.setCopiesAvailable(book.getCopiesAvailable());
+        return bookRepository.save(existing);
     }
 
     @Override
+    public void deleteBook(Integer bookId) {
+        bookRepository.delete(getBookById(bookId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Book getBookById(Integer bookId) {
+        return bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("Book not found: " + bookId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Book> getAllBooks() {
         return bookRepository.findAll();
     }
 
     @Override
-    public Book updateBook(Integer id, Book book) {
-        Book existing = getBookById(id);
-
-        existing.setTitle(book.getTitle());
-        existing.setAuthor(book.getAuthor());
-        existing.setIsbn(book.getIsbn());
-        existing.setPublishedYear(book.getPublishedYear());
-        existing.setCategory(book.getCategory());
-        existing.setTotalCopies(book.getTotalCopies());
-        existing.setLocationSection(book.getLocationSection());
-        existing.setLocationShelf(book.getLocationShelf());
-        existing.setLocationRow(book.getLocationRow());
-        existing.setStatus(book.getStatus());
-
-        // Only overwrite available copies if explicitly provided
-        if (book.getAvailableCopies() != null) {
-            existing.setAvailableCopies(book.getAvailableCopies());
-        }
-
-        normalizeCopies(existing);
-
-        return bookRepository.save(existing);
+    @Transactional(readOnly = true)
+    public List<Book> getBooksByTitle(String title) {
+        return bookRepository.findByTitleContainingIgnoreCase(title);
     }
 
     @Override
-    public void deleteBook(Integer id) {
-        if (!bookRepository.existsById(id)) {
-            throw new EntityNotFoundException("Book not found with id: " + id);
-        }
-        bookRepository.deleteById(id);
-    }
-
-    @Override
-    public List<Book> getBooksByStatus(BookStatus status) {
-        return bookRepository.findByStatus(status);
-    }
-
-    // ======================
-    // Helper
-    // ======================
-    private void normalizeCopies(Book book) {
-        if (book.getTotalCopies() == null || book.getTotalCopies() < 0) {
-            book.setTotalCopies(0);
-        }
-        if (book.getAvailableCopies() == null || book.getAvailableCopies() < 0) {
-            book.setAvailableCopies(0);
-        }
-        if (book.getAvailableCopies() > book.getTotalCopies()) {
-            book.setAvailableCopies(book.getTotalCopies());
-        }
+    @Transactional(readOnly = true)
+    public List<Book> getBooksByAuthor(String author) {
+        return bookRepository.findByAuthorContainingIgnoreCase(author);
     }
 }

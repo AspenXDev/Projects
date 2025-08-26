@@ -1,12 +1,19 @@
+// LoanDTO.java
 package com.library.lms.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+// Direct mapping to the 'loans' table.
 public record LoanDTO(
-    Long id,
-    Long bookId,
-    Long memberId,
+    Integer loanId,
+    Integer memberId, // Foreign key to members table
+    Integer bookId, // Foreign key to books table
     LocalDate loanDate,
     LocalDate dueDate,
-    String status
+    LocalDate returnDate, // Can be null
+    Integer renewCount,
+    String status, // Maps to ENUM('Active', 'Returned')
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt
 ) {}

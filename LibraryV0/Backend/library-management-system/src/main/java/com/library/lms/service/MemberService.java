@@ -11,6 +11,8 @@ public interface MemberService {
 
     Member getMemberById(Integer memberId);
 
+    Member getMemberFullDetails(String username); // fetch with loans, fines, reservations
+
     List<Member> getAllMembers();
 
     void deleteMember(Integer memberId);

@@ -8,6 +8,13 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "members")
+@NamedEntityGraph(
+	    name = "Member.loansAndReservations",
+	    attributeNodes = {
+	        @NamedAttributeNode("loans"),
+	        @NamedAttributeNode("reservations")
+	    }
+	)
 public class Member {
 
     @Id

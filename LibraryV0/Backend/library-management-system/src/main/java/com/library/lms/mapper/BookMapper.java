@@ -1,8 +1,8 @@
 // BookMapper.java
 package com.library.lms.mapper;
 
-import com.library.lms.dto.*;
-import com.library.lms.model.*;
+import com.library.lms.dto.BookDTO;
+import com.library.lms.model.Book;
 import com.library.lms.model.enums.BookStatus;
 
 import java.time.LocalDateTime;
@@ -97,3 +97,5 @@ public class BookMapper {
         return book;
     }
 }
+
+

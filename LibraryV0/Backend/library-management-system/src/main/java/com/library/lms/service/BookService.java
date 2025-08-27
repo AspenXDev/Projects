@@ -1,14 +1,14 @@
 package com.library.lms.service;
 
-import java.util.List;
 import com.library.lms.model.Book;
-import com.library.lms.model.enums.BookStatus;
+import java.util.List;
 
 public interface BookService {
     Book createBook(Book book);
-    Book getBookById(Integer id);
+    Book getBookById(Integer bookId);
     List<Book> getAllBooks();
-    Book updateBook(Integer id, Book book);
-    void deleteBook(Integer id);
-    List<Book> getBooksByStatus(BookStatus status);  // use enum
+    List<Book> searchBooks(String keyword); // search by title, author, isbn
+    Book updateBook(Book book);
+    void deleteBook(Integer bookId);
+    void updateAvailableCopies(Integer bookId, int newAvailableCopies);
 }

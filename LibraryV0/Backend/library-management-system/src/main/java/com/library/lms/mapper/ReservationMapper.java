@@ -1,8 +1,11 @@
 // ReservationMapper.java
 package com.library.lms.mapper;
 
-import com.library.lms.dto.*;
-import com.library.lms.model.*;
+import com.library.lms.dto.ReservationDTO;
+import com.library.lms.model.Book;
+import com.library.lms.model.Member;
+import com.library.lms.model.Reservation;
+import com.library.lms.model.enums.ReservationStatus;
 
 import java.time.LocalDateTime;
 

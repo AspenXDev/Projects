@@ -4,41 +4,72 @@
 
 - **Framework & Port:** Spring Boot, running on port `8080`.
 - **Database:** MySQL `Library_DB`. Entities map directly to tables: `users`, `members`, `librarians`, `books`, `loans`, `reservations`, `fines`.
-- **Security & Auth:**
 
-  - Stateless JWT-based authentication (`HS256`).
-  - All endpoints require valid JWT except `/auth/**`.
-  - JWT payload contains:
+### **Security & Auth:**
 
-    ```json
-    {
-      "sub": "john_doe", // username from users.username
-      "role": "MEMBER", // role_name mapped from roles table
-      "userId": 42, // user_id from users table
-      "iat": 1692568800, // issued at timestamp (seconds since epoch)
-      "exp": 1692576000 // expiration timestamp
-    }
-    ```
+- Stateless JWT-based authentication (`HS256`).
+- All endpoints require valid JWT except `/auth/**`.
+- JWT payload contains:
 
-  - Roles dynamically fetched from `roles` table for RBAC enforcement.
+  ```json
+  {
+    "sub": "john_doe", // username from users.username
+    "role": "MEMBER", // role_name mapped from roles table
+    "userId": 42, // user_id from users table
+    "iat": 1692568800, // issued at timestamp (seconds since epoch)
+    "exp": 1692576000 // expiration timestamp
+  }
+  ```
 
-- **RBAC Enforcement:**
+- Roles dynamically fetched from `roles` table for RBAC enforcement.
 
-  - Backend: `@PreAuthorize("hasRole('Librarians')")` for Librarian-only endpoints.
-  - Member-specific endpoints enforce ownership:
+### **RBAC Enforcement:**
 
-    ```java
-    @PreAuthorize("hasRole('Members')
-    ```
+- Backend: `@PreAuthorize("hasRole('Librarians')")` for Librarian-only endpoints.
+- Member-specific endpoints enforce ownership:
 
-  - Security filter chain integrated with `JwtAuthenticationFilter` that validates token, sets Spring Security context, and loads roles.
+  ```java
+  @PreAuthorize("hasRole('Members')
+  ```
 
-- **JWT Flow:**
+- Security filter chain integrated with `JwtAuthenticationFilter` that validates token, sets Spring Security context, and loads roles.
 
-  1. Client sends JWT in `Authorization: Bearer <token>`.
-  2. `JwtAuthenticationFilter` validates token.
-  3. Spring Security context populated with user details and roles.
-  4. `@PreAuthorize` annotations enforce access based on role and ownership.
+### **JWT Flow:**
+
+1. Client sends JWT in `Authorization: Bearer <token>`.
+2. `JwtAuthenticationFilter` validates token.
+3. Spring Security context populated with user details and roles.
+4. `@PreAuthorize` annotations enforce access based on role and ownership.
+
+Architecture:
+
+### Model
+
+Entities mapped to DB schema.
+
+### DTOs
+
+Clean transport objects for requests/responses.
+
+### Mappers/Converters
+
+Translate between Entity ↔ DTO.
+
+### Repository
+
+JPA Repos (don’t need touching unless schema mismatched).
+
+### Service
+
+Business rules + validation logic.
+
+### ServiceImpl
+
+Implementations.
+
+### Controller
+
+REST APIs (return DTOs, never Entities).
 
 ## Frontend
 

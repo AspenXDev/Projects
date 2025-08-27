@@ -1,7 +1,6 @@
 package com.library.lms.model.converters;
 
 import com.library.lms.model.enums.ReservationStatus;
-
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
@@ -10,11 +9,11 @@ public class ReservationStatusConverter implements AttributeConverter<Reservatio
 
     @Override
     public String convertToDatabaseColumn(ReservationStatus attribute) {
-        return attribute == null ? null : attribute.getDbValue();
+        return attribute == null ? null : attribute.toDbValue();
     }
 
     @Override
     public ReservationStatus convertToEntityAttribute(String dbData) {
-        return dbData == null ? null : ReservationStatus.fromDb(dbData);
+        return dbData == null ? null : ReservationStatus.fromDbValue(dbData);
     }
 }

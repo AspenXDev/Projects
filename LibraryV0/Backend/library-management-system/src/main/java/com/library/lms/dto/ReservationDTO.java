@@ -3,14 +3,17 @@ package com.library.lms.dto;
 
 import java.time.LocalDateTime;
 
-// Direct mapping to the 'reservations' table.
+/**
+ * A Data Transfer Object for representing Reservation information.
+ * This record is used for data exchange between the service layer and the controllers/client.
+ */
 public record ReservationDTO(
     Integer reservationId,
-    Integer memberId, // Foreign key to members table
-    Integer bookId, // Foreign key to books table
+    Integer memberId, // ID of the associated member
+    Integer bookId,   // ID of the associated book
     LocalDateTime reservationDate,
-    LocalDateTime holdUntil, // Can be null
-    String status, // Maps to ENUM('Waiting', 'On Hold', 'Collected', 'Cancelled')
+    LocalDateTime holdUntil,
+    String status,    // Represents ReservationStatus enum as String
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {}

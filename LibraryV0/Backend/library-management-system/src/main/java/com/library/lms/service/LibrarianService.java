@@ -1,18 +1,12 @@
 package com.library.lms.service;
 
-import java.util.List;
-
 import com.library.lms.model.Librarian;
+import java.util.List;
 
 public interface LibrarianService {
     Librarian createLibrarian(Librarian librarian);
-    Librarian updateLibrarian(Integer id, Librarian librarian);
-    void deleteLibrarian(Integer id);
+    Librarian getLibrarianById(Integer librarianId);
     List<Librarian> getAllLibrarians();
-    Librarian getLibrarianById(Integer id);
-
-    // Other convenience methods
-    List<Librarian> getLibrariansByFullName(String fullName);
-    Librarian getLibrarianByUserId(Integer userId);
-    
+    Librarian updateLibrarian(Librarian librarian);
+    void deleteLibrarian(Integer librarianId);
 }

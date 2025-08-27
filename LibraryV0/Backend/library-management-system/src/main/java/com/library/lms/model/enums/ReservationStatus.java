@@ -1,17 +1,29 @@
 package com.library.lms.model.enums;
-// helper for Reservation.java
+
 public enum ReservationStatus {
-    Waiting("Waiting"),
-    OnHold("On Hold"),
-    Collected("Collected"),
-    Cancelled("Cancelled");
+    WAITING,   // DB "Waiting"
+    ON_HOLD,   // DB "On Hold"
+    COLLECTED, // DB "Collected"
+    CANCELLED; // DB "Cancelled"
 
-    private final String dbValue;
-    ReservationStatus(String dbValue) { this.dbValue = dbValue; }
-    public String getDbValue() { return dbValue; }
+    public String toDbValue() {
+        switch (this) {
+            case WAITING: return "Waiting";
+            case ON_HOLD: return "On Hold";
+            case COLLECTED: return "Collected";
+            case CANCELLED: return "Cancelled";
+            default: throw new IllegalStateException("Unknown ReservationStatus: " + this);
+        }
+    }
 
-    public static ReservationStatus fromDb(String v) {
-        for (var s : values()) if (s.dbValue.equals(v)) return s;
-        throw new IllegalArgumentException("Unknown reservation status: " + v);
+    public static ReservationStatus fromDbValue(String dbValue) {
+        if (dbValue == null) return null;
+        switch (dbValue) {
+            case "Waiting": return WAITING;
+            case "On Hold": return ON_HOLD;
+            case "Collected": return COLLECTED;
+            case "Cancelled": return CANCELLED;
+            default: throw new IllegalArgumentException("Unknown reservation status DB value: " + dbValue);
+        }
     }
 }

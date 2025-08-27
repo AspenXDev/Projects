@@ -1,8 +1,9 @@
 // RoleMapper.java
 package com.library.lms.mapper;
 
-import com.library.lms.dto.*;
-import com.library.lms.model.*;
+import com.library.lms.dto.RoleDTO;
+import com.library.lms.model.Role;
+
 /**
  * Mapper for converting between {@link Role} entity and {@link RoleDTO} record.
  */

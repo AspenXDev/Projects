@@ -3,18 +3,17 @@ package com.library.lms.service.impl;
 import com.library.lms.model.Book;
 import com.library.lms.repository.BookRepository;
 import com.library.lms.service.BookService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
+import java.util.Optional;
 
 @Service
-@Transactional
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
 
+    @Autowired
     public BookServiceImpl(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
     }
@@ -25,46 +24,46 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book updateBook(Integer bookId, Book book) {
-        Book existing = bookRepository.findById(bookId)
-                .orElseThrow(() -> new EntityNotFoundException("Book not found: " + bookId));
-        existing.setTitle(book.getTitle());
-        existing.setAuthor(book.getAuthor());
-        existing.setPublisher(book.getPublisher());
-        existing.setIsbn(book.getIsbn());
-        existing.setYearPublished(book.getYearPublished());
-        existing.setGenre(book.getGenre());
-        existing.setCopiesAvailable(book.getCopiesAvailable());
-        return bookRepository.save(existing);
-    }
-
-    @Override
-    public void deleteBook(Integer bookId) {
-        bookRepository.delete(getBookById(bookId));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Book getBookById(Integer bookId) {
-        return bookRepository.findById(bookId)
-                .orElseThrow(() -> new EntityNotFoundException("Book not found: " + bookId));
+        Optional<Book> book = bookRepository.findById(bookId);
+        if (!book.isPresent()) {
+            throw new RuntimeException("Book not found with ID: " + bookId);
+        }
+        return book.get();
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Book> getAllBooks() {
         return bookRepository.findAll();
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Book> getBooksByTitle(String title) {
-        return bookRepository.findByTitleContainingIgnoreCase(title);
+    public List<Book> searchBooks(String keyword) {
+        return bookRepository.findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCaseOrIsbnContaining(keyword, keyword, keyword);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Book> getBooksByAuthor(String author) {
-        return bookRepository.findByAuthorContainingIgnoreCase(author);
+    public Book updateBook(Book book) {
+        if (!bookRepository.existsById(book.getBookId())) {
+            throw new RuntimeException("Book not found with ID: " + book.getBookId());
+        }
+        return bookRepository.save(book);
+    }
+
+    @Override
+    public void deleteBook(Integer bookId) {
+        bookRepository.deleteById(bookId);
+    }
+
+    @Override
+    public void updateAvailableCopies(Integer bookId, int newAvailableCopies) {
+        Book book = getBookById(bookId);
+        book.setAvailableCopies(newAvailableCopies);
+        if (newAvailableCopies == 0) {
+            book.setStatus("Borrowed");
+        } else {
+            book.setStatus("Available");
+        }
+        bookRepository.save(book);
     }
 }

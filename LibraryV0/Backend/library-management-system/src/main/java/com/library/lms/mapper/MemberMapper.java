@@ -2,29 +2,29 @@
 package com.library.lms.mapper;
 
 import com.library.lms.dto.MemberDetailsDTO;
-import com.library.lms.dto.MemberPureDTO;
+import com.library.lms.dto.MemberDTO;
 import com.library.lms.model.Member;
 import com.library.lms.model.User;
 
 import java.time.LocalDateTime;
 
 /**
- * Mapper for converting between {@link Member} entity and {@link MemberPureDTO} / {@link MemberDetailsDTO} records.
+ * Mapper for converting between {@link Member} entity and {@link MemberDTO} / {@link MemberDetailsDTO} records.
  */
 public class MemberMapper {
 
     /**
-     * Converts a {@link Member} entity to a {@link MemberPureDTO} record.
+     * Converts a {@link Member} entity to a {@link MemberDTO} record.
      * This DTO directly mirrors the 'members' table.
      *
      * @param member The Member entity to convert.
      * @return The corresponding MemberPureDTO record, or null if the entity is null.
      */
-    public static MemberPureDTO toDTO(Member member) {
+    public static MemberDTO toDTO(Member member) {
         if (member == null) {
             return null;
         }
-        return new MemberPureDTO(
+        return new MemberDTO(
                 member.getMemberId(),
                 member.getUser() != null ? member.getUser().getUserId() : null,
                 member.getFullName(),
@@ -69,14 +69,14 @@ public class MemberMapper {
     }
 
     /**
-     * Converts a {@link MemberPureDTO} record to a new {@link Member} entity.
-     * Note: This method does not set the associated User entity. Use {@link #toEntity(MemberPureDTO, User)}
+     * Converts a {@link MemberDTO} record to a new {@link Member} entity.
+     * Note: This method does not set the associated User entity. Use {@link #toEntity(MemberDTO, User)}
      * or set the User in the service layer after this conversion.
      *
      * @param dto The MemberPureDTO record to convert.
      * @return A new Member entity, or null if the DTO is null.
      */
-    public static Member toEntity(MemberPureDTO dto) {
+    public static Member toEntity(MemberDTO dto) {
         if (dto == null) {
             return null;
         }
@@ -93,14 +93,14 @@ public class MemberMapper {
     }
 
     /**
-     * Converts a {@link MemberPureDTO} record to a new {@link Member} entity and associates it with an existing {@link User}.
+     * Converts a {@link MemberDTO} record to a new {@link Member} entity and associates it with an existing {@link User}.
      *
      * @param dto The MemberPureDTO record to convert.
      * @param user The existing User entity to associate with the Member.
      * @return A new Member entity with the associated User, or null if the DTO is null.
      * @throws IllegalArgumentException if the User is null.
      */
-    public static Member toEntity(MemberPureDTO dto, User user) {
+    public static Member toEntity(MemberDTO dto, User user) {
         if (user == null) throw new IllegalArgumentException("User cannot be null when creating a Member entity.");
         Member member = toEntity(dto); // Use the base conversion
         if (member != null) {
@@ -110,13 +110,13 @@ public class MemberMapper {
     }
 
     /**
-     * Updates an existing {@link Member} entity with data from a {@link MemberPureDTO} record.
+     * Updates an existing {@link Member} entity with data from a {@link MemberDTO} record.
      *
      * @param member The existing Member entity to update.
      * @param dto The MemberPureDTO record containing the updated data.
      * @return The updated Member entity.
      */
-    public static Member updateEntityFromDTO(Member member, MemberPureDTO dto) {
+    public static Member updateEntityFromDTO(Member member, MemberDTO dto) {
         if (member == null || dto == null) {
             return member;
         }
@@ -132,4 +132,3 @@ public class MemberMapper {
     }
 }
 
-/////////////////////////////////////////////////////////////////////

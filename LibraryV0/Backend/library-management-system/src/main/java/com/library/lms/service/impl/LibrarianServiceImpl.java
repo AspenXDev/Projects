@@ -3,18 +3,17 @@ package com.library.lms.service.impl;
 import com.library.lms.model.Librarian;
 import com.library.lms.repository.LibrarianRepository;
 import com.library.lms.service.LibrarianService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
+import java.util.Optional;
 
 @Service
-@Transactional
 public class LibrarianServiceImpl implements LibrarianService {
 
     private final LibrarianRepository librarianRepository;
 
+    @Autowired
     public LibrarianServiceImpl(LibrarianRepository librarianRepository) {
         this.librarianRepository = librarianRepository;
     }
@@ -25,41 +24,29 @@ public class LibrarianServiceImpl implements LibrarianService {
     }
 
     @Override
-    public Librarian updateLibrarian(Integer librarianId, Librarian librarian) {
-        Librarian existing = librarianRepository.findById(librarianId)
-                .orElseThrow(() -> new EntityNotFoundException("Librarian not found: " + librarianId));
-        existing.setFullName(librarian.getFullName());
-        return librarianRepository.save(existing);
-    }
-
-    @Override
-    public void deleteLibrarian(Integer librarianId) {
-        librarianRepository.delete(getLibrarianById(librarianId));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Librarian getLibrarianById(Integer librarianId) {
-        return librarianRepository.findById(librarianId)
-                .orElseThrow(() -> new EntityNotFoundException("Librarian not found: " + librarianId));
+        Optional<Librarian> librarian = librarianRepository.findById(librarianId);
+        if (!librarian.isPresent()) {
+            throw new RuntimeException("Librarian not found with ID: " + librarianId);
+        }
+        return librarian.get();
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Librarian> getAllLibrarians() {
         return librarianRepository.findAll();
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Librarian> getLibrariansByFullName(String fullName) {
-        return librarianRepository.findByFullNameContainingIgnoreCase(fullName);
+    public Librarian updateLibrarian(Librarian librarian) {
+        if (!librarianRepository.existsById(librarian.getLibrarianId())) {
+            throw new RuntimeException("Librarian not found with ID: " + librarian.getLibrarianId());
+        }
+        return librarianRepository.save(librarian);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Librarian getLibrarianByUserId(Integer userId) {
-        return librarianRepository.findByUserUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Librarian not found with userId " + userId));
+    public void deleteLibrarian(Integer librarianId) {
+        librarianRepository.deleteById(librarianId);
     }
 }

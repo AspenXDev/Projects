@@ -1,15 +1,26 @@
 package com.library.lms.model.enums;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-
 public enum BookStatus {
-	Available,
-    Borrowed,
-    Reserved;
+    AVAILABLE, // DB value: "Available"
+    BORROWED,  // DB value: "Borrowed"
+    RESERVED;  // DB value: "Reserved"
 
-//    @JsonCreator
-//    public static BookStatus from(String value) {
-//        if (value == null) return AVAILABLE;
-//       return BookStatus.valueOf(value.toUpperCase());
-//    }
+    public String toDbValue() {
+        switch (this) {
+            case AVAILABLE: return "Available";
+            case BORROWED: return "Borrowed";
+            case RESERVED: return "Reserved";
+            default: throw new IllegalStateException("Unknown BookStatus: " + this);
+        }
+    }
+
+    public static BookStatus fromDbValue(String dbValue) {
+        if (dbValue == null) return null;
+        switch (dbValue) {
+            case "Available": return AVAILABLE;
+            case "Borrowed": return BORROWED;
+            case "Reserved": return RESERVED;
+            default: throw new IllegalArgumentException("Unknown book status DB value: " + dbValue);
+        }
+    }
 }

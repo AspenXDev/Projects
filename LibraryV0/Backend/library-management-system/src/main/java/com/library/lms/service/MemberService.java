@@ -1,19 +1,12 @@
 package com.library.lms.service;
 
-import java.util.List;
 import com.library.lms.model.Member;
+import java.util.List;
 
 public interface MemberService {
-
     Member createMember(Member member);
-
-    Member updateMember(Integer memberId, Member member);
-
     Member getMemberById(Integer memberId);
-
-    Member getMemberFullDetails(String username); // fetch with loans, fines, reservations
-
     List<Member> getAllMembers();
-
+    Member updateMember(Member member);
     void deleteMember(Integer memberId);
 }

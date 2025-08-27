@@ -1,11 +1,12 @@
 // MapperFactory.java
 package com.library.lms.mapper;
 
-import com.library.lms.dto.UserDTO;
-import com.library.lms.model.Librarian;
-import com.library.lms.model.Member;
-import com.library.lms.model.Role;
-import com.library.lms.model.User;
+import com.library.lms.model.*;
+import com.library.lms.model.*;
+//import com.library.lms.model.Librarian;
+//import com.library.lms.model.Member;
+//import com.library.lms.model.Role;
+//import com.library.lms.model.User;
 
 import java.time.LocalDateTime;
 
@@ -44,10 +45,4 @@ public class MapperFactory {
         // created_at and updated_at are set by the database
         return user;
     }
-
-    // Removed the toMember(Member member) and toLibrarian(Librarian librarian) methods
-    // from MapperFactory. These methods had complex logic for creating users and
-    // associating roles based on full names, which is better suited for a dedicated
-    // user/member/librarian registration service. Mappers should primarily focus on
-    // converting between DTOs and entities.
 }

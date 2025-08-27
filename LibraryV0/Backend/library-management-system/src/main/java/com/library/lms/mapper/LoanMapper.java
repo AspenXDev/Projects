@@ -1,8 +1,10 @@
 // LoanMapper.java
 package com.library.lms.mapper;
 
-import com.library.lms.dto.*;
-import com.library.lms.model.*;
+import com.library.lms.dto.LoanDTO;
+import com.library.lms.model.Book;
+import com.library.lms.model.Loan;
+import com.library.lms.model.Member;
 
 import java.time.LocalDateTime;
 

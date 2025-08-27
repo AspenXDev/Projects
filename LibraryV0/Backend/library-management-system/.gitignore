@@ -1,5 +1,22 @@
-/.target/
-/.mvn/
-/.settings/
-/.logs/
-/.target/
+# Maven build
+/target/
+
+# Logs
+*.log
+/logs/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db

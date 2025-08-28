@@ -1,14 +1,11 @@
-export default function MemberCard({ member }) {
+import React from "react";
+import { AuthProvider, useAuth } from "../contexts/AuthContext.jsx";
+export function MemberCard({ member }) {
   return (
-    <div
-      style={{
-        border: "1px solid #ddd",
-        padding: "1rem",
-        marginBottom: "0.5rem",
-      }}
-    >
-      <h3>{member.name}</h3>
-      <p>Email: {member.email}</p>
+    <div>
+      <h4>{member.full_name}</h4>
+      <p>Membership Valid Until: {member.membership_valid_until}</p>
+      <p>Status: {member.membership_status}</p>
     </div>
   );
 }

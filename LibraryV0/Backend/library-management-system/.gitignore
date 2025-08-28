@@ -1,22 +1,23 @@
+# =========================
 # Maven build
+# =========================
 /target/
 
+# =========================
 # Logs
+# =========================
 *.log
 /logs/
 
+# =========================
 # Eclipse
+# =========================
 .project
 .classpath
 .settings/
 
-# IntelliJ IDEA
-.idea/
-*.iml
-
-# VS Code
-.vscode/
-
-# OS junk
+# =========================
+# OS generated junk
+# =========================
 .DS_Store
 Thumbs.db

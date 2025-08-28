@@ -1,6 +1,7 @@
+// PATH: src/components/LogOutButton.jsx
 import React from "react";
-import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "../contexts/AuthContext.jsx";
 
 export function LogOutButton() {
   const { logout } = useAuth();
@@ -8,7 +9,7 @@ export function LogOutButton() {
 
   const handleLogout = () => {
     logout();
-    navigate("/", { replace: true }); // Always go back to LandingPage
+    navigate("/", { replace: true });
   };
 
   return (
@@ -17,9 +18,10 @@ export function LogOutButton() {
       style={{
         padding: "6px 12px",
         cursor: "pointer",
-        borderRadius: 4,
+        borderRadius: 6,
         border: "1px solid #888",
-        backgroundColor: "#fff",
+        background: "#fff",
+        color: "#003366",
       }}
     >
       Log Out

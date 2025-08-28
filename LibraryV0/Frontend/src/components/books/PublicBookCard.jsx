@@ -1,8 +1,11 @@
+// PATH: src/components/books/PublicBookCard.jsx
 import React from "react";
+import "../../styling/BookCard.css"; // <-- correct relative path: from components/books -> src/styling
+import { AuthProvider, useAuth } from "../../contexts/AuthContext.jsx";
 
-export const PublicBookCard = ({ book }) => {
-  // Support both camelCase and snake_case from API
-  const available = book.availableCopies ?? book.available_copies ?? 0;
+export function PublicBookCard({ book }) {
+  const available =
+    book.availableCopies ?? book.available_copies ?? book.available_copies ?? 0;
   const status = book.status ?? "Unknown";
   const section = book.locationSection ?? book.location_section ?? "";
   const shelf = book.locationShelf ?? book.location_shelf ?? "";
@@ -33,4 +36,4 @@ export const PublicBookCard = ({ book }) => {
       </div>
     </article>
   );
-};
+}

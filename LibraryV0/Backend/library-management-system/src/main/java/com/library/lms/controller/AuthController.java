@@ -1,52 +1,52 @@
+// PATH: src/main/java/com/library/lms/controller/AuthController.java
 package com.library.lms.controller;
 
-import com.library.lms.auth.JwtUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.library.lms.auth.JwtTokenProvider;
+import com.library.lms.dto.AuthRequest;
+import com.library.lms.dto.AuthResponse;
+import com.library.lms.model.User;
+import com.library.lms.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.*;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
+// (Optional) Allow calls from Vite dev server
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
-        this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
+    @Autowired
+    public AuthController(UserService userService, JwtTokenProvider jwtTokenProvider) {
+        this.userService = userService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    public static class LoginRequest {
-        public String username;
-        public String password;
+    @GetMapping("/me")
+    public ResponseEntity<User> me(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String token = authHeader.substring("Bearer ".length());
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        if (username == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        User user = userService.getUserByUsername(username);
+        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
-        logger.info("Login attempt for user: {}", req.username);
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
+        User user = userService.authenticate(authRequest.getUsername(), authRequest.getPassword());
+        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
-        try {
-            Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.username, req.password)
-            );
-
-            String token = jwtUtil.generateToken(auth.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails
-                    ? (org.springframework.security.core.userdetails.UserDetails) auth.getPrincipal()
-                    : null);
-
-            return ResponseEntity.ok(Map.of("message", "Login successful", "token", token));
-
-        } catch (BadCredentialsException ex) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Bad Request", "message", "Bad credentials"));
-        } catch (Exception ex) {
-            return ResponseEntity.internalServerError().body(Map.of("error", "Internal Server Error", "message", ex.getMessage()));
-        }
+        String token = jwtTokenProvider.generateToken(user);
+        return ResponseEntity.ok(new AuthResponse(user, token));
     }
 }

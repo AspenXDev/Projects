@@ -1,38 +1,42 @@
+// PATH: src/main/java/com/library/lms/auth/JwtTokenProvider.java
 package com.library.lms.auth;
 
-import java.util.Date;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
-
+import com.library.lms.model.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.JwtException;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
 
-    private final String jwtSecret = "yourSecretKey123"; // ❗ Move to config in production
-    private final long jwtExpirationMs = 86400000; // 1 day
+    private static final String SECRET_KEY = "mySuperSecretKey1234567890mySuperSecretKey1234567890mySuperSecretKey1234567890mySuperSecretKey1234567890mySuperSecretKey1234567890";
+    // repeated mySuperSecretKey1234567890 five times.
+    /////repeating patterns are okay for development/test, more randomness to prevent predictability required for prod.
+    private static final long EXPIRATION_TIME = 3600000; // 1 hour
 
-    public String generateToken(Authentication authentication) {
-        UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
-
+    public String generateToken(User user) {
         return Jwts.builder()
-            .setSubject(userPrincipal.getUsername())
-            .setIssuedAt(now)
-            .setExpiration(expiryDate)
-            .signWith(SignatureAlgorithm.HS512, jwtSecret)
-            .compact();
+                .setSubject(user.getUsername())
+                .claim("role", user.getRole() != null ? user.getRole().getRoleName() : null)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .compact();
     }
 
-    public String getUsernameFromJWT(String token) {
-        return Jwts.parser()
-            .setSigningKey(jwtSecret)
-            .parseClaimsJws(token)
-            .getBody()
-            .getSubject();
+    public String getUsernameFromToken(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(SECRET_KEY)
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getSubject();
+        } catch (JwtException | IllegalArgumentException e) {
+            return null; // invalid/expired token
+        }
     }
 }

@@ -1,203 +1,32 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+// PATH: src/pages/LandingPage.jsx
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
-import { login as loginService } from "../services/AuthService";
 import "../styling/LandingPage.css";
-import { PublicBookCard } from "../components/PublicBookCard";
-import axios from "axios";
+import { BooksPublicList } from "../components/books/BooksPublicList.jsx";
+import { AuthProvider, useAuth } from "../contexts/AuthContext.jsx";
 
-const PAGE_SIZE = 12;
-
-export const LandingPage = () => {
-  const [allBooks, setAllBooks] = useState([]);
-  const [visibleBooks, setVisibleBooks] = useState([]);
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const [showAuth, setShowAuth] = useState(false);
-  const [authMode, setAuthMode] = useState("login");
-
-  const { login } = useAuth();
+export function LandingPage() {
   const navigate = useNavigate();
-  const loaderRef = useRef(null);
-
-  // Fetch all books
-  const fetchAllBooks = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await axios.get("http://localhost:8081/books");
-      const data = Array.isArray(res.data) ? res.data : [];
-      setAllBooks(data);
-      setVisibleBooks(data.slice(0, PAGE_SIZE));
-      setPage(1);
-      setHasMore(data.length > PAGE_SIZE);
-    } catch (e) {
-      console.error(e);
-      setError("Unable to load books.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchAllBooks();
-  }, [fetchAllBooks]);
-
-  // Load more for infinite scroll
-  const loadMore = useCallback(() => {
-    if (!hasMore || loading) return;
-    setPage((prev) => {
-      const nextPage = prev + 1;
-      setVisibleBooks(allBooks.slice(0, nextPage * PAGE_SIZE));
-      if (nextPage * PAGE_SIZE >= allBooks.length) setHasMore(false);
-      return nextPage;
-    });
-  }, [allBooks, hasMore, loading]);
-
-  useEffect(() => {
-    const loader = loaderRef.current;
-    if (!loader) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) loadMore();
-      },
-      { root: null, rootMargin: "200px", threshold: 0.1 }
-    );
-    observer.observe(loader);
-    return () => {
-      if (loader) observer.unobserve(loader);
-    };
-  }, [loadMore]);
-
-  // Handle login from modal
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    const username = e.target[0].value;
-    const password = e.target[1].value;
-
-    try {
-      const role = await login(username, password);
-      setShowAuth(false);
-
-      if (role?.toLowerCase().startsWith("librar")) {
-        navigate("/librarian-dashboard");
-      } else {
-        navigate("/member-dashboard");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Invalid username or password");
-    }
-  };
-
-  const handleRegisterSubmit = (e) => {
-    e.preventDefault();
-    setShowAuth(false);
-  };
-
   return (
-    <div className="landing-page">
-      <header className="landing-topbar">
-        <h1 className="landing-title">Library</h1>
-        <button className="auth-toggle-btn" onClick={() => setShowAuth(true)}>
-          Login / Register
-        </button>
+    <div className="landing-page" style={{ padding: 20 }}>
+      <header style={{ display: "flex", justifyContent: "space-between" }}>
+        <h1>Library</h1>
+        <div>
+          <button onClick={() => navigate("/login")}>Login</button>
+          <button onClick={() => navigate("/books")} style={{ marginLeft: 8 }}>
+            Browse Books
+          </button>
+        </div>
       </header>
 
-      <section className="landing-hero">
+      <section style={{ marginTop: 16 }}>
         <h2>Explore our collection</h2>
         <p>Browse books and magazines. Scroll to load more.</p>
       </section>
 
-      <main className="cards-wrap">
-        {error && <p className="error">{error}</p>}
-        {loading && <p className="muted">Loading…</p>}
-        {!loading && !error && visibleBooks.length === 0 && (
-          <p className="muted">No books available.</p>
-        )}
-
-        <div className="public-grid">
-          {visibleBooks.map((b) => (
-            <PublicBookCard key={b.bookId ?? b.book_id ?? b.isbn} book={b} />
-          ))}
-        </div>
-
-        <div ref={loaderRef} className="infinite-loader">
-          {hasMore ? "Loading more…" : "— End of list —"}
-        </div>
+      <main style={{ marginTop: 24 }}>
+        <BooksPublicList />
       </main>
-
-      {showAuth && (
-        <>
-          <div className="auth-backdrop" onClick={() => setShowAuth(false)} />
-          <aside className="auth-panel" role="dialog">
-            <div className="auth-header">
-              <button
-                className={`auth-tab ${authMode === "login" ? "active" : ""}`}
-                onClick={() => setAuthMode("login")}
-              >
-                Login
-              </button>
-              <button
-                className={`auth-tab ${
-                  authMode === "register" ? "active" : ""
-                }`}
-                onClick={() => setAuthMode("register")}
-              >
-                Create Account
-              </button>
-              <button className="auth-close" onClick={() => setShowAuth(false)}>
-                ✕
-              </button>
-            </div>
-
-            {authMode === "login" ? (
-              <form className="auth-form" onSubmit={handleLoginSubmit}>
-                <label>
-                  Username
-                  <input type="text" required />
-                </label>
-                <label>
-                  Password
-                  <input type="password" required />
-                </label>
-                <button type="submit" className="primary-btn">
-                  Login
-                </button>
-              </form>
-            ) : (
-              <form className="auth-form" onSubmit={handleRegisterSubmit}>
-                <label>
-                  Username
-                  <input type="text" required />
-                </label>
-                <label>
-                  Email
-                  <input type="email" required />
-                </label>
-                <label>
-                  Full Name
-                  <input type="text" required />
-                </label>
-                <label>
-                  Password
-                  <input type="password" required />
-                </label>
-                <div className="hint">
-                  New accounts are created as <b>Members</b> and marked{" "}
-                  <b>inactive</b> until approved.
-                </div>
-                <button type="submit" className="primary-btn">
-                  Create Account
-                </button>
-              </form>
-            )}
-          </aside>
-        </>
-      )}
     </div>
   );
-};
+}

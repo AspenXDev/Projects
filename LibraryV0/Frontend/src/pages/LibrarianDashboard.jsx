@@ -1,17 +1,11 @@
 import React from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { Navbar } from "../components/Navbar";
+import { AuthProvider, useAuth } from "../contexts/AuthContext.jsx";
 
 export function LibrarianDashboard() {
-  const { user } = useAuth();
-
   return (
     <div>
-      <Navbar currentPage="Librarian Dashboard" />
-      <div style={{ padding: 20 }}>
-        <h3>{user?.username || "Librarian"}, welcome to your dashboard!</h3>
-        {/* Add more librarian-specific content*/}
-      </div>
+      <h2>Librarian Dashboard</h2>
+      <p>Manage books, members, and reservations.</p>
     </div>
   );
 }

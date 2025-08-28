@@ -1,22 +1,23 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Navigate } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext.jsx";
 
 export function PrivateRoute({ roles, children }) {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
 
+  // If no user, block access → redirect to login/home
   if (!user) {
-    // No user logged in -> go to LandingPage
     return <Navigate to="/" replace />;
   }
 
+  // If roles are specified and user doesn’t match → block access
   if (
     roles &&
-    !roles.some((r) => r.toLowerCase() === user.role.toLowerCase())
+    !roles.some((r) => r.toLowerCase() === user.role?.toLowerCase())
   ) {
-    // Role mismatch -> go to LandingPage
     return <Navigate to="/" replace />;
   }
 
+  // Otherwise allow access
   return children;
 }

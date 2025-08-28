@@ -1,25 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { getUserProfile } from "../services/AuthService";
-import MemberDashboard from "./MemberDashboard";
-import LibrarianDashboard from "./LibrarianDashboard";
+import React from "react";
+import { AuthProvider, useAuth } from "../contexts/AuthContext.jsx";
 
-const Dashboard = () => {
-  const [role, setRole] = useState(null);
-
-  useEffect(() => {
-    getUserProfile()
-      .then((res) => setRole(res.data.role)) // { role: "Members" or "Librarians" }
-      .catch(() => setRole(null));
-  }, []);
-
-  if (!role) return <p>Loading...</p>;
-
+export function Dashboard() {
   return (
-    <div className="p-6">
-      {role === "Members" && <MemberDashboard />}
-      {role === "Librarians" && <LibrarianDashboard />}
+    <div>
+      <h2>Dashboard</h2>
+      <p>Select a module from the navbar.</p>
     </div>
   );
-};
-
-export default Dashboard;
+}

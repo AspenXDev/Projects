@@ -1,0 +1,60 @@
+// path: Frontend/src/styling/Dashboard.css
+.dashboard-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 16px;
+  font-family: Arial, sans-serif;
+}
+
+h2 {
+  margin-bottom: 24px;
+}
+
+.summary-cards {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.card {
+  background: #f7f7f7;
+  padding: 16px;
+  flex: 1 1 200px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.label {
+  font-weight: bold;
+}
+
+.value {
+  color: #333;
+}
+
+.loans-section {
+  margin-top: 24px;
+}
+
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.muted {
+  color: #888;
+  font-style: italic;
+}

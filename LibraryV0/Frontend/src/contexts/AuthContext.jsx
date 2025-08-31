@@ -1,3 +1,4 @@
+// src/contexts/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext(null);
@@ -29,7 +30,7 @@ export function AuthProvider({ children }) {
     const newUser = {
       username: data.username,
       token: data.token,
-      role: data.role?.toLowerCase() ?? "members",
+      role: data.role?.toLowerCase() ?? "member",
       user_id: data.userId ?? null,
     };
 

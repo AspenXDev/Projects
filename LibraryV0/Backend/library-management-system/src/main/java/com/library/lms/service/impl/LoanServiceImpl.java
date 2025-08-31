@@ -4,9 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-
 import org.springframework.stereotype.Service;
-
 import com.library.lms.exception.LoanNotFoundException;
 import com.library.lms.model.Book;
 import com.library.lms.model.Fine;
@@ -17,7 +15,6 @@ import com.library.lms.repository.LoanRepository;
 import com.library.lms.service.BookService;
 import com.library.lms.service.LoanService;
 import com.library.lms.service.MemberService;
-
 import jakarta.transaction.Transactional;
 
 @Service
@@ -53,11 +50,13 @@ public class LoanServiceImpl implements LoanService {
                 .filter(l -> l.getStatus() == Loan.LoanStatus.Active)
                 .toList();
 
-        if (activeLoans.size() >= 3) throw new RuntimeException("Borrowing limit reached (3 active loans).");
+        if (activeLoans.size() >= 3)
+            throw new RuntimeException("Borrowing limit reached (3 active loans).");
 
         boolean hasOverdue = activeLoans.stream()
                 .anyMatch(l -> l.getDueDate().isBefore(LocalDate.now()) && l.getReturnDate() == null);
-        if (hasOverdue) throw new RuntimeException("Cannot borrow with overdue loans.");
+        if (hasOverdue)
+            throw new RuntimeException("Cannot borrow with overdue loans.");
 
         BigDecimal unpaidFines = fineRepository.findByLoan_Member_MemberId(memberId)
                 .stream()
@@ -68,7 +67,8 @@ public class LoanServiceImpl implements LoanService {
         if (unpaidFines.compareTo(BigDecimal.valueOf(10.0)) > 0)
             throw new RuntimeException("Outstanding fines exceed $10. Cannot borrow.");
 
-        if (book.getAvailableCopies() <= 0) throw new RuntimeException("Book not available.");
+        if (book.getAvailableCopies() <= 0)
+            throw new RuntimeException("Book not available.");
 
         Loan loan = new Loan();
         loan.setMember(member);
@@ -117,13 +117,10 @@ public class LoanServiceImpl implements LoanService {
 
         if (loan.getStatus() != Loan.LoanStatus.Active)
             throw new RuntimeException("Only active loans can be renewed.");
-
         if (loan.getReturnDate() != null)
             throw new RuntimeException("Loan already returned.");
-
         if (loan.getDueDate().isBefore(LocalDate.now()))
             throw new RuntimeException("Cannot renew overdue loans.");
-
         if (loan.getRenewCount() >= 2)
             throw new RuntimeException("Maximum renewals reached (2).");
 

@@ -2,7 +2,7 @@
 import { api } from "./api.js";
 
 // Public fetch — no token
-export async function getAllPublicBooks() {
+export async function getAllBooks() {
   try {
     const res = await api.get("/books"); // backend /books is permitAll
     return res.data;

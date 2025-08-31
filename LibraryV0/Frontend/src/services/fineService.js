@@ -1,8 +1,11 @@
 import { api } from "./api";
 
-export const FineService = {
-  getAllFines: async () => {
-    const response = await api.get("/fines");
-    return response.data;
-  },
+export const getAllFines = async () => {
+  const response = await api.get("/fines");
+  return response.data;
+};
+
+export const getFinesByMemberId = async (memberId) => {
+  const response = await api.get(`/fines/member/${memberId}`);
+  return response.data;
 };

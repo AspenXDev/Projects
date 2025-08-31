@@ -1,9 +1,7 @@
 package com.library.lms.service.impl;
 
 import java.util.List;
-
 import org.springframework.stereotype.Service;
-
 import com.library.lms.exception.FineNotFoundException;
 import com.library.lms.exception.LoanNotFoundException;
 import com.library.lms.model.Fine;
@@ -11,7 +9,6 @@ import com.library.lms.model.Loan;
 import com.library.lms.repository.FineRepository;
 import com.library.lms.service.FineService;
 import com.library.lms.service.LoanService;
-
 import jakarta.transaction.Transactional;
 
 @Service
@@ -34,10 +31,7 @@ public class FineServiceImpl implements FineService {
 
         Loan loan = loanService.getLoanById(fine.getLoan().getLoanId());
         fine.setLoan(loan);
-
-        if (fine.getPaid() == null) {
-            fine.setPaid(false);
-        }
+        if (fine.getPaid() == null) fine.setPaid(false);
 
         return fineRepository.save(fine);
     }
@@ -57,9 +51,8 @@ public class FineServiceImpl implements FineService {
     public Fine updateFine(Integer fineId, Fine fineDetails) {
         Fine fine = getFineById(fineId);
 
-        if (fineDetails.getAmount() != null) {
+        if (fineDetails.getAmount() != null)
             fine.setAmount(fineDetails.getAmount());
-        }
 
         fine.setPaid(fineDetails.getPaid() != null ? fineDetails.getPaid() : fine.getPaid());
 

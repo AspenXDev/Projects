@@ -1,6 +1,6 @@
 // PATH: src/App.jsx
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { LandingPage } from "./pages/LandingPage.jsx";
 import { LoginPage } from "./components/auth/LoginPage.jsx";
 import { BooksPublicList } from "./components/books/BooksPublicList.jsx";
@@ -15,24 +15,28 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/books" element={<BooksPublicList />} />
 
+      {/* Member route */}
       <Route
-        path="/member-dashboard"
+        path="/members"
         element={
-          <PrivateRoute roles={["members"]}>
+          <PrivateRoute roles={["member"]}>
             <MemberDashboard />
           </PrivateRoute>
         }
       />
+
+      {/* Librarian route */}
       <Route
-        path="/librarian-dashboard"
+        path="/librarians"
         element={
-          <PrivateRoute roles={["librarians"]}>
+          <PrivateRoute roles={["librarian"]}>
             <LibrarianDashboard />
           </PrivateRoute>
         }
       />
+
       {/* fallback */}
-      <Route path="*" element={<LandingPage />} />
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }

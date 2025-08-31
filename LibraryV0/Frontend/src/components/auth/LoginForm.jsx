@@ -1,4 +1,4 @@
-// PATH: src/components/auth/LoginForm.jsx
+// src/components/auth/LoginForm.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext.jsx";
@@ -19,29 +19,23 @@ export function LoginForm() {
     setError("");
 
     try {
-      // POST username & password only
       const res = await api.post("/auth/login", { username, password });
-      const data = res.data; // { username, role: { roleName }, token, userId }
+      const data = res.data;
 
       if (!data || !data.token) {
         setError("Invalid response from server");
         return;
       }
 
-      // Store response in AuthContext
-      const role = login(data); // returns lowercase role
+      const role = login(data); // stores user & returns role
 
-      // Navigate based on role
-      if (role === "librarians") {
-        navigate("/librarian-dashboard");
-      } else {
-        navigate("/members");
-      }
+      // Role-based navigation
+      if (role === "librarian") navigate("/librarians");
+      else if (role === "member") navigate("/members");
+      else navigate("/");
     } catch (err) {
       console.error(err);
-      setError(
-        err.response?.data?.message || "Login failed: check username/password"
-      );
+      setError(err.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }

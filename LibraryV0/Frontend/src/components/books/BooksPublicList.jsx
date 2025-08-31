@@ -1,6 +1,6 @@
 // src/components/books/BooksPublicList.jsx
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { getAllPublicBooks } from "../../services/BookService.js";
+import { getAllBooks } from "../../services/BookService.js";
 import { PublicBookCard } from "./PublicBookCard.jsx";
 import "../../styling/BooksLists.css";
 
@@ -17,7 +17,7 @@ export function BooksPublicList() {
   const fetchAllBooks = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getAllPublicBooks();
+      const data = await getAllBooks();
       setAllBooks(data);
       setVisibleBooks(data.slice(0, PAGE_SIZE));
       setPage(1);

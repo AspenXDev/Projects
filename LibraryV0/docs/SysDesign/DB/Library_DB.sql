@@ -37,9 +37,9 @@ CREATE TABLE members (
     registration_date DATE NOT NULL,
     membership_valid_until DATE NOT NULL,
     membership_status ENUM('Active', 'Expired') DEFAULT 'Active',
-    -- active_loans INT DEFAULT 0,         -- for future versions. derived, not stored
-    -- overdue_items INT DEFAULT 0,        -- for future versions. derived
-    -- total_unpaid_fines DECIMAL(5,2)     -- for future versions. derived
+    -- active_loans INT DEFAULT 0,         -- derived (LoanServiceImpl #2), not stored. Store in future versions?
+    -- overdue_items INT DEFAULT 0,        -- derived (LoanServiceImpl #3), not stored. Store in future versions?
+    -- total_unpaid_fines DECIMAL(5,2)     -- derived (LoanServiceImpl #4), not stored. Store in future versions?
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	FOREIGN KEY (user_id) REFERENCES users(user_id)

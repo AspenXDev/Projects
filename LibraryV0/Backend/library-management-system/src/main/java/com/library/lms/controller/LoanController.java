@@ -18,35 +18,25 @@ public class LoanController {
     }
 
     // ======================
-    // CRUD
+    // Domain endpoints
     // ======================
-    @GetMapping
-    public List<Loan> getAllLoans() {
-        return loanService.getAllLoans();
+    @PostMapping("/borrow/{memberId}/{bookId}")
+    public Loan borrowBook(@PathVariable Integer memberId, @PathVariable Integer bookId) {
+        return loanService.borrowBook(memberId, bookId);
     }
 
-    @GetMapping("/{id}")
-    public Loan getLoanById(@PathVariable Integer id) {
-        return loanService.getLoanById(id);
+    @PutMapping("/return/{loanId}")
+    public Loan returnBook(@PathVariable Integer loanId) {
+        return loanService.returnBook(loanId);
     }
 
-    @PostMapping
-    public Loan createLoan(@RequestBody Loan loan) {
-        return loanService.createLoan(loan);
-    }
-
-    @PutMapping("/{id}")
-    public Loan updateLoan(@PathVariable Integer id, @RequestBody Loan loanDetails) {
-        return loanService.updateLoan(id, loanDetails);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteLoan(@PathVariable Integer id) {
-        loanService.deleteLoan(id);
+    @PutMapping("/renew/{loanId}")
+    public Loan renewLoan(@PathVariable Integer loanId) {
+        return loanService.renewLoan(loanId);
     }
 
     // ======================
-    // Convenience endpoints
+    // Convenience
     // ======================
     @GetMapping("/member/{memberId}")
     public List<Loan> getLoansByMember(@PathVariable Integer memberId) {

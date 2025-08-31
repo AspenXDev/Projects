@@ -9,6 +9,7 @@ import com.library.lms.service.FineService;
 
 @RestController
 @RequestMapping("/fines")
+@CrossOrigin(origins = "*") // allow React frontend
 public class FineController {
 
     private final FineService fineService;
@@ -60,7 +61,7 @@ public class FineController {
         return fineService.getFinesByMemberId(memberId);
     }
 
-    @GetMapping("/paid/{paid}")
+    @GetMapping("/status/{paid}")
     public List<Fine> getFinesByPaidStatus(@PathVariable Boolean paid) {
         return fineService.getFinesByPaidStatus(paid);
     }

@@ -9,8 +9,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-// Make this class globally applied to all controllers
-@ControllerAdvice 
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
     // Handle FineNotFoundException
@@ -20,6 +19,17 @@ public class GlobalExceptionHandler {
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.NOT_FOUND.value());
         body.put("error", "Fine Not Found");
+        body.put("message", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    // Handle LoanNotFoundException
+    @ExceptionHandler(LoanNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleLoanNotFound(LoanNotFoundException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.NOT_FOUND.value());
+        body.put("error", "Loan Not Found");
         body.put("message", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
@@ -34,5 +44,4 @@ public class GlobalExceptionHandler {
         body.put("message", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
-
 }

@@ -1,17 +1,13 @@
 package com.library.lms.service.impl;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.library.lms.model.Role;
 import com.library.lms.repository.RoleRepository;
 import com.library.lms.service.RoleService;
+import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
+import java.util.List;
 
 @Service
-@Transactional
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
@@ -28,7 +24,13 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Role getRoleById(Integer roleId) {
         return roleRepository.findById(roleId)
-                .orElseThrow(() -> new RuntimeException("Role not found with ID: " + roleId));
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+    }
+
+    @Override
+    public Role getRoleByName(String roleName) {
+        return roleRepository.findByRoleName(roleName)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
     }
 
     @Override
@@ -47,11 +49,5 @@ public class RoleServiceImpl implements RoleService {
     public void deleteRole(Integer roleId) {
         Role role = getRoleById(roleId);
         roleRepository.delete(role);
-    }
-
-    @Override
-    public Role getRoleByName(String roleName) {
-        return roleRepository.findByRoleName(roleName)
-                .orElseThrow(() -> new RuntimeException("Role not found with name: " + roleName));
     }
 }

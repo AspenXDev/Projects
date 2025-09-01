@@ -13,7 +13,6 @@ public class LibrarianMapper {
         return librarian;
     }
 
-    // Optional: create a new Librarian from scratch
     public static Librarian createLibrarian(String fullName, User user) {
         if (user == null) throw new IllegalArgumentException("User cannot be null");
         Librarian librarian = new Librarian();

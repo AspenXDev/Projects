@@ -1,10 +1,12 @@
-// PATH: src/components/Navbar.jsx
+// path: Frontend/src/components/Navbar.jsx
 import React from "react";
 import { LogOutButton } from "./LogOutButton.jsx";
 import { useAuth } from "../contexts/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <nav
@@ -20,7 +22,25 @@ export default function Navbar() {
       <div style={{ fontWeight: 700, color: "#003366" }}>
         {user ? `Welcome, ${user.username}` : "Library App"}
       </div>
-      <div>{user && <LogOutButton />}</div>
+      <div>
+        {!user ? (
+          <button
+            style={{
+              padding: "6px 12px",
+              backgroundColor: "#003366",
+              color: "#fff",
+              border: "none",
+              borderRadius: 4,
+              cursor: "pointer",
+            }}
+            onClick={() => navigate("/login")}
+          >
+            Login
+          </button>
+        ) : (
+          <LogOutButton />
+        )}
+      </div>
     </nav>
   );
 }

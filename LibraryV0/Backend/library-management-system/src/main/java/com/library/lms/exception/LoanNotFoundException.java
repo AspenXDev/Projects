@@ -1,7 +1,5 @@
 package com.library.lms.exception;
 
 public class LoanNotFoundException extends RuntimeException {
-    public LoanNotFoundException(String message) {
-        super(message);
-    }
+    public LoanNotFoundException(String msg) { super(msg); }
 }

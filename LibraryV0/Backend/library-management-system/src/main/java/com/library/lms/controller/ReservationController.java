@@ -1,14 +1,14 @@
 package com.library.lms.controller;
 
-import java.util.List;
-
+import com.library.lms.model.Reservation;
+import com.library.lms.model.enums.ReservationStatus;
+import com.library.lms.service.ReservationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.library.lms.model.Reservation;
-import com.library.lms.model.enums.ReservationStatus;
-import com.library.lms.service.ReservationService;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/reservations")
@@ -21,51 +21,83 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<Reservation> createReservation(@RequestBody Reservation reservation) {
-        Reservation created = reservationService.createReservation(reservation);
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    public ResponseEntity<?> createReservation(@RequestBody Reservation reservation) {
+        try {
+            Reservation created = reservationService.createReservation(reservation);
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to create reservation");
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Reservation> getReservationById(@PathVariable Integer id) {
-        Reservation reservation = reservationService.getReservationById(id);
-        return ResponseEntity.ok(reservation);
+    public ResponseEntity<?> getReservationById(@PathVariable Integer id) {
+        try {
+            return ResponseEntity.ok(reservationService.getReservationById(id));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Reservation not found with ID: " + id);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving reservation");
+        }
     }
 
     @GetMapping
     public ResponseEntity<List<Reservation>> getAllReservations() {
-        List<Reservation> reservations = reservationService.getAllReservations();
-        return ResponseEntity.ok(reservations);
+        return ResponseEntity.ok(reservationService.getAllReservations());
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<Reservation>> getReservationsByStatus(@PathVariable ReservationStatus status) {
-        List<Reservation> reservations = reservationService.getReservationsByStatus(status);
-        return ResponseEntity.ok(reservations);
+    public ResponseEntity<?> getReservationsByStatus(@PathVariable String status) {
+        try {
+            ReservationStatus reservationStatus = ReservationStatus.fromDb(status);
+            return ResponseEntity.ok(reservationService.getReservationsByStatus(reservationStatus));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Invalid reservation status: " + status);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving reservations");
+        }
     }
 
     @GetMapping("/member/{memberId}")
-    public ResponseEntity<List<Reservation>> getReservationsByMember(@PathVariable Integer memberId) {
-        List<Reservation> reservations = reservationService.getReservationsByMemberId(memberId);
-        return ResponseEntity.ok(reservations);
+    public ResponseEntity<?> getReservationsByMember(@PathVariable Integer memberId) {
+        try {
+            return ResponseEntity.ok(reservationService.getReservationsByMemberId(memberId));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No reservations found for member ID: " + memberId);
+        }
     }
 
     @GetMapping("/book/{bookId}")
-    public ResponseEntity<List<Reservation>> getReservationsByBook(@PathVariable Integer bookId) {
-        List<Reservation> reservations = reservationService.getReservationsByBookId(bookId);
-        return ResponseEntity.ok(reservations);
+    public ResponseEntity<?> getReservationsByBook(@PathVariable Integer bookId) {
+        try {
+            return ResponseEntity.ok(reservationService.getReservationsByBookId(bookId));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No reservations found for book ID: " + bookId);
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Reservation> updateReservation(@PathVariable Integer id, @RequestBody Reservation reservation) {
-        reservation.setReservationId(id);
-        Reservation updated = reservationService.updateReservation(reservation);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<?> updateReservation(@PathVariable Integer id, @RequestBody Reservation reservation) {
+        try {
+            return ResponseEntity.ok(reservationService.updateReservation(id, reservation));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Reservation not found with ID: " + id);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to update reservation");
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable Integer id) {
-        reservationService.deleteReservation(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteReservation(@PathVariable Integer id) {
+        try {
+            reservationService.deleteReservation(id);
+            return ResponseEntity.noContent().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Reservation not found with ID: " + id);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to delete reservation");
+        }
     }
 }

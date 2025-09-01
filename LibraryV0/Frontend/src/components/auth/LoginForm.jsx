@@ -1,4 +1,4 @@
-// path: src/components/auth/LoginForm.jsx
+// path: Frontend/src/components/auth/LoginForm.jsx
 import React, { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext.jsx";
 import { login as loginService } from "../../services/AuthService.js";

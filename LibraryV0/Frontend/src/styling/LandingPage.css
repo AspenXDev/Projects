@@ -1,75 +1,112 @@
-/* path: Frontend/src/styling/LandingPage.css */
-.landing-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: "Segoe UI", sans-serif;
-}
+// path: Frontend/src/pages/LandingPage.jsximport React, { useEffect, useState } from "react";
+import { getAllBooks } from "../services/BookService.js";
+import { useAuth } from "../contexts/AuthContext.jsx";
+import { BookCard } from "../components/books/BookCard.jsx";
+import "../styling/LandingPage.css";
 
-.landing-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  padding: 15px 20px;
-  background: linear-gradient(90deg, #4a90e2, #50e3c2);
-  border-radius: 12px;
-  color: white;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
+const unwrap = (r) => (r && r.data !== undefined ? r.data : r);
 
-.landing-header h1 {
-  font-size: 2rem;
-  margin: 0;
-}
+export function LandingPage() {
+  const { user, logout } = useAuth();
+  const [books, setBooks] = useState([]);
+  const [featured, setFeatured] = useState([]);
+  const [search, setSearch] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
 
-.login-btn {
-  background-color: white;
-  color: #4a90e2;
-  border: none;
-  padding: 8px 16px;
-  font-weight: bold;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
+  useEffect(() => {
+    getAllBooks()
+      .then(unwrap)
+      .then((data) => {
+        const list = Array.isArray(data) ? data : [];
+        setBooks(list);
 
-.login-btn:hover {
-  background-color: #e1f5fe;
-}
+        // Fixed New Arrivals by title (choose three stable titles that exist)
+        const chosenTitles = ["Pride and Prejudice", "1984", "To Kill A Mockingbird"];
+        const chosen = list.filter((b) => chosenTitles.includes(b.title));
+        // fallback: if not found, just take first 3
+        setFeatured(chosen.length ? chosen.slice(0, 3) : list.slice(0, 3));
+      })
+      .catch((err) => {
+        console.error("Error fetching books:", err);
+        setBooks([]);
+        setFeatured([]);
+      });
+  }, []);
 
-/* search/filter */
-.search-filter {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 30px;
-}
+  const categories = Array.from(new Set((books || []).map((b) => b.category).filter(Boolean))).sort();
 
-.search-filter input,
-.search-filter select {
-  padding: 8px 12px;
-  font-size: 16px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
+  const filteredBooks = (books || []).filter((b) => {
+    const titleMatch = !search || (b.title || "").toLowerCase().includes(search.toLowerCase());
+    const categoryMatch = !filterCategory || ((b.category || "").toLowerCase() === filterCategory.toLowerCase());
+    return titleMatch && categoryMatch;
+  });
 
-/* books grid */
-.books-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px;
-}
+  return (
+    <div className="landing-container">
+      <header className="landing-header">
+        <h1>Welcome to the Library</h1>
+        <div>
+          {!user ? (
+            <button className="login-btn" onClick={() => (window.location.href = "/login")}>
+              Login
+            </button>
+          ) : (
+            <button
+              className="login-btn"
+              onClick={() => {
+                logout();
+                window.location.href = "/";
+              }}
+            >
+              Logout
+            </button>
+          )}
+        </div>
+      </header>
 
-.featured-books h2,
-.all-books h2 {
-  margin-bottom: 15px;
-  color: #333;
-}
+      <section className="search-filter">
+        <input
+          aria-label="Search books by title"
+          type="text"
+          placeholder="Search by title..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+          <option value="">All Categories</option>
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
+      </section>
 
-/* muted fallback text */
-.muted {
-  color: #888;
-  text-align: center;
-  margin-top: 10px;
+      {featured.length > 0 && (
+        <section className="featured-books">
+          <h2>New Arrivals</h2>
+          <div className="books-grid">
+            {featured.map((book) => {
+              const key = book.bookId ?? book.book_id ?? book.id ?? book.isbn ?? book.title;
+              return <BookCard key={key} book={book} />;
+            })}
+          </div>
+        </section>
+      )}
+
+      <section className="all-books" style={{ marginTop: 24 }}>
+        <h2>All Books</h2>
+        {filteredBooks.length === 0 ? (
+          <p className="muted">No books found.</p>
+        ) : (
+          <div className="books-grid">
+            {filteredBooks.map((book) => {
+              const key = book.bookId ?? book.book_id ?? book.id ?? book.isbn ?? book.title;
+              return <BookCard key={key} book={book} />;
+            })}
+          </div>
+        )}
+      </section>
+    </div>
+  );
 }

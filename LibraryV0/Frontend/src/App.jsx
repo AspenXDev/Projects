@@ -7,20 +7,37 @@ import { MemberDashboard } from "./pages/MemberDashboard.jsx";
 import { LibrarianDashboard } from "./pages/LibrarianDashboard.jsx";
 import { Books } from "./pages/Books.jsx";
 import { PrivateRoute } from "./components/PrivateRoute.jsx";
+import { Layout } from "./components/Layout.jsx";
 
 export default function App() {
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/"
+        element={
+          <Layout>
+            <LandingPage />
+          </Layout>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <Layout>
+            <LoginPage />
+          </Layout>
+        }
+      />
 
       {/* Member routes */}
       <Route
         path="/members"
         element={
           <PrivateRoute roles={["member"]}>
-            <MemberDashboard />
+            <Layout>
+              <MemberDashboard />
+            </Layout>
           </PrivateRoute>
         }
       />
@@ -30,17 +47,21 @@ export default function App() {
         path="/librarians"
         element={
           <PrivateRoute roles={["librarian"]}>
-            <LibrarianDashboard />
+            <Layout>
+              <LibrarianDashboard />
+            </Layout>
           </PrivateRoute>
         }
       />
 
-      {/* Example books page accessible only to members */}
+      {/* Books page accessible to members and librarians */}
       <Route
         path="/books"
         element={
           <PrivateRoute roles={["member", "librarian"]}>
-            <Books />
+            <Layout>
+              <Books />
+            </Layout>
           </PrivateRoute>
         }
       />

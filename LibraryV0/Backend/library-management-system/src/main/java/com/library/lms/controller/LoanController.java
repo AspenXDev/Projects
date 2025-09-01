@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.library.lms.model.Loan;
 import com.library.lms.service.LoanService;
+import com.library.lms.model.enums.LoanStatus;
 
 @RestController
 @RequestMapping("/loans")
@@ -49,7 +50,8 @@ public class LoanController {
     }
 
     @GetMapping("/status/{status}")
-    public List<Loan> getLoansByStatus(@PathVariable Loan.LoanStatus status) {
+    public List<Loan> getLoansByStatus(@PathVariable LoanStatus status) {
         return loanService.getLoansByStatus(status);
+
     }
 }

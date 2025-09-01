@@ -20,11 +20,6 @@ public class MemberController {
     // ======================
     // CRUD
     // ======================
-    @PostMapping
-    public Member createMember(@RequestBody Member member) {
-        return memberService.createMember(member);
-    }
-
     @GetMapping("/{id}")
     public Member getMemberById(@PathVariable Integer id) {
         return memberService.getMemberById(id);

@@ -1,17 +1,13 @@
 package com.library.lms.service.impl;
 
+import com.library.lms.exception.BookNotFoundException;
 import com.library.lms.model.Book;
-import com.library.lms.model.enums.BookStatus;
 import com.library.lms.repository.BookRepository;
 import com.library.lms.service.BookService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service
-@Transactional
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
@@ -21,15 +17,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book createBook(Book book) {
-        normalizeCopies(book);
-        return bookRepository.save(book);
-    }
-
-    @Override
-    public Book getBookById(Integer id) {
-        return bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Book not found with id: " + id));
+    public Book getBookById(Integer bookId) {
+        return bookRepository.findById(bookId)
+                .orElseThrow(() -> new BookNotFoundException("Book not found with id: " + bookId));
     }
 
     @Override
@@ -38,55 +28,29 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book updateBook(Integer id, Book book) {
-        Book existing = getBookById(id);
+    public Book createBook(Book book) {
+        return bookRepository.save(book);
+    }
 
-        existing.setTitle(book.getTitle());
-        existing.setAuthor(book.getAuthor());
-        existing.setIsbn(book.getIsbn());
-        existing.setPublishedYear(book.getPublishedYear());
-        existing.setCategory(book.getCategory());
-        existing.setTotalCopies(book.getTotalCopies());
-        existing.setLocationSection(book.getLocationSection());
-        existing.setLocationShelf(book.getLocationShelf());
-        existing.setLocationRow(book.getLocationRow());
-        existing.setStatus(book.getStatus());
-
-        // Only overwrite available copies if explicitly provided
-        if (book.getAvailableCopies() != null) {
-            existing.setAvailableCopies(book.getAvailableCopies());
-        }
-
-        normalizeCopies(existing);
-
+    @Override
+    public Book updateBook(Integer bookId, Book updatedBook) {
+        Book existing = getBookById(bookId);
+        existing.setTitle(updatedBook.getTitle());
+        existing.setAuthor(updatedBook.getAuthor());
+        existing.setIsbn(updatedBook.getIsbn());
+        existing.setCategory(updatedBook.getCategory());
+        existing.setTotalCopies(updatedBook.getTotalCopies());
+        existing.setAvailableCopies(updatedBook.getAvailableCopies());
+        existing.setLocationSection(updatedBook.getLocationSection());
+        existing.setLocationShelf(updatedBook.getLocationShelf());
+        existing.setLocationRow(updatedBook.getLocationRow());
+        existing.setStatus(updatedBook.getStatus());
         return bookRepository.save(existing);
     }
 
     @Override
-    public void deleteBook(Integer id) {
-        if (!bookRepository.existsById(id)) {
-            throw new EntityNotFoundException("Book not found with id: " + id);
-        }
-        bookRepository.deleteById(id);
-    }
-
-    @Override
-    public List<Book> getBooksByStatus(BookStatus status) {
-        return bookRepository.findByStatus(status);
-    }
-
-    // ======================
-    // Helper
-    // ======================
-    private void normalizeCopies(Book book) {
-        if (book.getTotalCopies() == null || book.getTotalCopies() < 0) {
-            book.setTotalCopies(0);
-        }
-        if (book.getAvailableCopies() == null || book.getAvailableCopies() < 0) {
-            book.setAvailableCopies(0);
-        }
-        if (book.getAvailableCopies() > book.getTotalCopies()) {
-            book.setAvailableCopies(book.getTotalCopies());
-        }
+    public void deleteBook(Integer bookId) {
+        Book existing = getBookById(bookId);
+        bookRepository.delete(existing);
     }
 }

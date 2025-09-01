@@ -2,18 +2,19 @@ package com.library.lms.service.impl;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.stereotype.Service;
-
 import com.library.lms.mapper.LibrarianMapper;
 import com.library.lms.model.Librarian;
 import com.library.lms.model.User;
 import com.library.lms.repository.LibrarianRepository;
 import com.library.lms.repository.UserRepository;
 import com.library.lms.service.LibrarianService;
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import com.library.lms.exception.MemberNotFoundException;
+import com.library.lms.exception.BookNotFoundException;
+import com.library.lms.exception.LoanNotFoundException;
+import com.library.lms.exception.ReservationNotFoundException;
 
 @Service
 @Transactional

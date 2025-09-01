@@ -28,6 +28,9 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+    // -------------------------------
+    // Security Filter Chain
+    // -------------------------------
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -37,20 +40,40 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // allow CORS preflight requests
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                // auth endpoints public
+                // public auth endpoints
                 .requestMatchers("/auth/**").permitAll()
                 // public book list
                 .requestMatchers(HttpMethod.GET, "/books/**").permitAll()
-                // other book endpoints need librarian
+                // other book endpoints need librarian role
                 .requestMatchers("/books/**").hasRole("Librarians")
                 // everything else requires authentication
                 .anyRequest().authenticated()
             )
+            // add JWT filter before Spring Security auth filter
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    // -------------------------------
+    // Password Encoder Bean
+    // -------------------------------
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    // -------------------------------
+    // Authentication Manager Bean
+    // -------------------------------
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    // -------------------------------
+    // CORS Configuration
+    // -------------------------------
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -62,15 +85,5 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
     }
 }

@@ -1,17 +1,14 @@
 package com.library.lms.service.impl;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.library.lms.model.Reservation;
 import com.library.lms.model.enums.ReservationStatus;
 import com.library.lms.repository.ReservationRepository;
 import com.library.lms.service.ReservationService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
-@Transactional
 public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -26,19 +23,14 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public Reservation getReservationById(Integer reservationId) {
-        return reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + reservationId));
+    public Reservation getReservationById(Integer id) {
+        return reservationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reservation not found with ID " + id));
     }
 
     @Override
     public List<Reservation> getAllReservations() {
         return reservationRepository.findAll();
-    }
-
-    @Override
-    public List<Reservation> getReservationsByStatus(ReservationStatus status) {
-        return reservationRepository.findByStatus(status);
     }
 
     @Override
@@ -52,15 +44,23 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public Reservation updateReservation(Reservation reservation) {
-        if (reservation.getReservationId() == null) {
-            throw new IllegalArgumentException("Reservation ID must not be null for update");
-        }
-        return reservationRepository.save(reservation);
+    public List<Reservation> getReservationsByStatus(ReservationStatus status) {
+        return reservationRepository.findByStatus(status);
     }
 
     @Override
-    public void deleteReservation(Integer reservationId) {
-        reservationRepository.deleteById(reservationId);
+    public Reservation updateReservation(Integer id, Reservation reservationDetails) {
+        Reservation existing = getReservationById(id);
+        existing.setBook(reservationDetails.getBook());
+        existing.setMember(reservationDetails.getMember());
+        existing.setStatus(reservationDetails.getStatus());
+        existing.setHoldUntil(reservationDetails.getHoldUntil());
+        return reservationRepository.save(existing);
+    }
+
+    @Override
+    public void deleteReservation(Integer id) {
+        Reservation existing = getReservationById(id);
+        reservationRepository.delete(existing);
     }
 }

@@ -1,81 +1,47 @@
 package com.library.lms.controller;
 
+import com.library.lms.dto.RegistrationRequest;
+import com.library.lms.mapper.MapperFactory;
+import com.library.lms.model.Member;
 import com.library.lms.model.User;
+import com.library.lms.service.MemberService;
 import com.library.lms.service.UserService;
-import com.library.lms.exception.ResourceNotFoundException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
+    private final MemberService memberService;
 
-    @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, MemberService memberService) {
         this.userService = userService;
+        this.memberService = memberService;
     }
 
-    // =========================
-    // CRUD - Users
-    // =========================
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User created = userService.createUser(user);
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
-    }
+    @PostMapping("/register")
+    public ResponseEntity<String> registerUser(@RequestBody RegistrationRequest request) {
+        if (userService.existsByUsername(request.getUsername()))
+            return ResponseEntity.badRequest().body("Username already exists");
+        if (userService.existsByEmail(request.getEmail()))
+            return ResponseEntity.badRequest().body("Email already exists");
 
-    @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
-    }
+        // 1️⃣ Create User
+        User newUser = MapperFactory.createUser(
+                request.getUsername(),
+                request.getEmail(),
+                request.getPassword(),
+                "Members"
+        );
+        User savedUser = userService.createUser(newUser);
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Integer id) {
-        User user = userService.getUserById(id);
-        if (user == null) {
-            throw new ResourceNotFoundException("User not found with id: " + id);
-        }
-        return ResponseEntity.ok(user);
-    }
+        // 2️⃣ Create Member linked to User
+        Member member = new Member();
+        member.setFullName(request.getFullName());
+        Member savedMember = memberService.createMember(member, savedUser);
 
-    @GetMapping("/by-username/{username}")
-    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
-        User user = userService.getUserByUsername(username);
-        if (user == null) {
-            throw new ResourceNotFoundException("User not found with username: " + username);
-        }
-        return ResponseEntity.ok(user);
-    }
-
-    @GetMapping("/by-email/{email}")
-    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-        User user = userService.getUserByEmail(email);
-        if (user == null) {
-            throw new ResourceNotFoundException("User not found with email: " + email);
-        }
-        return ResponseEntity.ok(user);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Integer id, @RequestBody User user) {
-        User updated = userService.updateUser(id, user);
-        if (updated == null) {
-            throw new ResourceNotFoundException("User not found with id: " + id);
-        }
-        return ResponseEntity.ok(updated);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
-        userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("User and Member registered successfully: " + savedUser.getUsername());
     }
 }

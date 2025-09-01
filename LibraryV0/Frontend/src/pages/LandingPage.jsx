@@ -1,14 +1,12 @@
-// path : Frontend/src/pages/LandingPage.jsx
+// path: Frontend/src/pages/LandingPage.jsx
 import React, { useEffect, useState } from "react";
 import { getAllBooks } from "../services/BookService.js";
-import { useAuth } from "../contexts/AuthContext.jsx";
 import { BookCard } from "../components/books/BookCard.jsx";
 import "../styling/LandingPage.css";
 
 const unwrap = (r) => (r && r.data !== undefined ? r.data : r);
 
-export const LandingPage = () => {
-  const { user, logout } = useAuth();
+export function LandingPage() {
   const [books, setBooks] = useState([]);
   const [featured, setFeatured] = useState([]);
   const [search, setSearch] = useState("");
@@ -18,48 +16,47 @@ export const LandingPage = () => {
     getAllBooks()
       .then(unwrap)
       .then((data) => {
-        setBooks(data || []);
-        if (data?.length > 3) {
-          const shuffled = [...data].sort(() => 0.5 - Math.random());
-          setFeatured(shuffled.slice(0, 3));
-        } else {
-          setFeatured(data);
-        }
+        const list = Array.isArray(data) ? data : [];
+        setBooks(list);
+
+        // Fixed New Arrivals by title (choose three stable titles that exist)
+        const chosenTitles = [
+          "Pride and Prejudice",
+          "1984",
+          "To Kill A Mockingbird",
+        ];
+        const chosen = list.filter((b) => chosenTitles.includes(b.title));
+        setFeatured(chosen.length ? chosen.slice(0, 3) : list.slice(0, 3));
       })
-      .catch((err) => console.error("Error fetching books:", err));
+      .catch((err) => {
+        console.error("Error fetching books:", err);
+        setBooks([]);
+        setFeatured([]);
+      });
   }, []);
 
-  const filteredBooks = books.filter(
-    (b) =>
-      (!search || b.title.toLowerCase().includes(search.toLowerCase())) &&
-      (!filterCategory ||
-        (b.category ?? "").toLowerCase() === filterCategory.toLowerCase())
-  );
-
   const categories = Array.from(
-    new Set(books.map((b) => b.category).filter(Boolean))
-  );
+    new Set((books || []).map((b) => b.category).filter(Boolean))
+  ).sort();
+
+  const filteredBooks = (books || []).filter((b) => {
+    const titleMatch =
+      !search || (b.title || "").toLowerCase().includes(search.toLowerCase());
+    const categoryMatch =
+      !filterCategory ||
+      (b.category || "").toLowerCase() === filterCategory.toLowerCase();
+    return titleMatch && categoryMatch;
+  });
 
   return (
     <div className="landing-container">
       <header className="landing-header">
         <h1>Welcome to the Library</h1>
-        {!user ? (
-          <button
-            className="login-btn"
-            onClick={() => (window.location.href = "/login")}
-          >
-            Login
-          </button>
-        ) : (
-          <button className="login-btn" onClick={logout}>
-            Logout
-          </button>
-        )}
       </header>
 
       <section className="search-filter">
         <input
+          aria-label="Search books by title"
           type="text"
           placeholder="Search by title..."
           value={search}
@@ -80,27 +77,39 @@ export const LandingPage = () => {
 
       {featured.length > 0 && (
         <section className="featured-books">
-          <h2>New In</h2>
+          <h2>New Arrivals</h2>
           <div className="books-grid">
-            {featured.map((book) => (
-              <BookCard key={book.bookId} book={book} />
-            ))}
+            {featured.map((book) => {
+              const key =
+                book.bookId ??
+                book.book_id ??
+                book.id ??
+                book.isbn ??
+                book.title;
+              return <BookCard key={key} book={book} />;
+            })}
           </div>
         </section>
       )}
 
-      <section className="all-books">
+      <section className="all-books" style={{ marginTop: 24 }}>
         <h2>All Books</h2>
         {filteredBooks.length === 0 ? (
           <p className="muted">No books found.</p>
         ) : (
           <div className="books-grid">
-            {filteredBooks.map((book) => (
-              <BookCard key={book.bookId} book={book} />
-            ))}
+            {filteredBooks.map((book) => {
+              const key =
+                book.bookId ??
+                book.book_id ??
+                book.id ??
+                book.isbn ??
+                book.title;
+              return <BookCard key={key} book={book} />;
+            })}
           </div>
         )}
       </section>
     </div>
   );
-};
+}

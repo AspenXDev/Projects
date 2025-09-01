@@ -1,10 +1,9 @@
 package com.library.lms.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Set;
-import jakarta.persistence.*;
+import com.library.lms.model.enums.LoanStatus;
 
 @Entity
 @Table(name = "loans")
@@ -15,14 +14,12 @@ public class Loan {
     @Column(name = "loan_id")
     private Integer loanId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "member_id", nullable = false)
-    @JsonIgnoreProperties({"loans", "reservations"})
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "book_id", nullable = false)
-    @JsonIgnoreProperties({"loans", "reservations"})
     private Book book;
 
     @Column(name = "loan_date", nullable = false)
@@ -41,104 +38,31 @@ public class Loan {
     @Column(name = "status", nullable = false)
     private LoanStatus status = LoanStatus.Active;
 
-    @Column(name = "created_at", insertable = false, updatable = false, nullable = false)
+    @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", insertable = false, updatable = false, nullable = false)
+    @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "loan", fetch = FetchType.LAZY)
-    @JsonIgnoreProperties("loan")
-    private Set<Fine> fines;
-
-    public enum LoanStatus { Active, Returned }
-
-    // Getters and Setters
-	public Integer getLoanId() {
-		return loanId;
-	}
-
-	public void setLoanId(Integer loanId) {
-		this.loanId = loanId;
-	}
-
-	public Member getMember() {
-		return member;
-	}
-
-	public void setMember(Member member) {
-		this.member = member;
-	}
-
-	public Book getBook() {
-		return book;
-	}
-
-	public void setBook(Book book) {
-		this.book = book;
-	}
-
-	public LocalDate getLoanDate() {
-		return loanDate;
-	}
-
-	public void setLoanDate(LocalDate loanDate) {
-		this.loanDate = loanDate;
-	}
-
-	public LocalDate getDueDate() {
-		return dueDate;
-	}
-
-	public void setDueDate(LocalDate dueDate) {
-		this.dueDate = dueDate;
-	}
-
-	public LocalDate getReturnDate() {
-		return returnDate;
-	}
-
-	public void setReturnDate(LocalDate returnDate) {
-		this.returnDate = returnDate;
-	}
-
-	public Integer getRenewCount() {
-		return renewCount;
-	}
-
-	public void setRenewCount(Integer renewCount) {
-		this.renewCount = renewCount;
-	}
-
-	public LoanStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(LoanStatus status) {
-		this.status = status;
-	}
-
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public LocalDateTime getUpdatedAt() {
-		return updatedAt;
-	}
-
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
-	}
-
-	public Set<Fine> getFines() {
-		return fines;
-	}
-
-	public void setFines(Set<Fine> fines) {
-		this.fines = fines;
-	}
+    // --- Getters & Setters ---
+    public Integer getLoanId() { return loanId; }
+    public void setLoanId(Integer loanId) { this.loanId = loanId; }
+    public Member getMember() { return member; }
+    public void setMember(Member member) { this.member = member; }
+    public Book getBook() { return book; }
+    public void setBook(Book book) { this.book = book; }
+    public LocalDate getLoanDate() { return loanDate; }
+    public void setLoanDate(LocalDate loanDate) { this.loanDate = loanDate; }
+    public LocalDate getDueDate() { return dueDate; }
+    public void setDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
+    public LocalDate getReturnDate() { return returnDate; }
+    public void setReturnDate(LocalDate returnDate) { this.returnDate = returnDate; }
+    public Integer getRenewCount() { return renewCount; }
+    public void setRenewCount(Integer renewCount) { this.renewCount = renewCount; }
+    public LoanStatus getStatus() { return status; }
+    public void setStatus(LoanStatus status) { this.status = status; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

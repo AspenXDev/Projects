@@ -1,4 +1,4 @@
-// path: src/pages/MemberDashboard.jsx
+// path: Frontend/src/pages/MemberDashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { getLoansByMemberId } from "../services/LoanService.js";

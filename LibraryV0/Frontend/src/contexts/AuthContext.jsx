@@ -1,37 +1,44 @@
-// src/contexts/AuthContext.jsx
+// path: src/contexts/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-export const AuthContext = createContext(null);
+const AuthContext = createContext(null);
 
 export function useAuth() {
   return useContext(AuthContext);
 }
 
 export function AuthProvider({ children }) {
+  const navigate = useNavigate();
   const [user, setUser] = useState(() => {
-    try {
-      const saved = localStorage.getItem("user");
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
+    const saved = localStorage.getItem("user");
+    return saved ? JSON.parse(saved) : null;
   });
 
+  // Only load once on mount
   useEffect(() => {
     if (!user) {
       const saved = localStorage.getItem("user");
       if (saved) setUser(JSON.parse(saved));
     }
-  }, [user]);
+  }, []); // empty dependency to run only once
 
   function login(data) {
     if (!data || !data.token) throw new Error("Invalid login response");
 
+    // normalize role to lowercase for routing
+    const normalizedRole =
+      data.role === "Members"
+        ? "member"
+        : data.role === "Librarians"
+        ? "librarian"
+        : "member";
+
     const newUser = {
       username: data.username,
       token: data.token,
-      role: data.role?.toLowerCase() ?? "member",
-      user_id: data.userId ?? null,
+      role: normalizedRole,
+      userId: data.userId ?? null,
     };
 
     setUser(newUser);
@@ -39,7 +46,13 @@ export function AuthProvider({ children }) {
     localStorage.setItem("token", newUser.token);
     localStorage.setItem("role", newUser.role);
 
-    return newUser.role;
+    // Navigate immediately based on role
+    if (normalizedRole === "member") navigate("/members", { replace: true });
+    else if (normalizedRole === "librarian")
+      navigate("/librarians", { replace: true });
+    else navigate("/", { replace: true });
+
+    return newUser;
   }
 
   function logout() {
@@ -47,6 +60,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     localStorage.removeItem("role");
+    navigate("/login", { replace: true });
   }
 
   return (

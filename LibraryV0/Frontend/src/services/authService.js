@@ -1,20 +1,16 @@
-// PATH: src/services/authService.js
-import { api } from "./api";
+// src/services/AuthService.js
+import axios from "axios";
 
-export const login = async (username, password) => {
-  try {
-    const response = await api.post("/auth/login", {
-      username,
-      password,
-    });
-    const { token, username: user, role } = response.data;
+const API_URL = "http://localhost:8081/auth";
 
-    // save token to localStorage for later
-    localStorage.setItem("token", token);
+export async function login(username, password) {
+  const response = await axios.post(`${API_URL}/login`, { username, password });
+  return response.data; // should be { username, role, token }
+}
 
-    return { user, role, token };
-  } catch (err) {
-    console.error("Login failed:", err.response?.data || err.message);
-    throw err;
-  }
-};
+export async function getCurrentUser(token) {
+  const response = await axios.get(`${API_URL}/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+}

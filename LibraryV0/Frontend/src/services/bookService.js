@@ -1,29 +1,29 @@
-// src/services/BookService.js
+// path: Frontend/src/services/BookService.js
 import { api } from "./api.js";
 
-// Public fetch — no token
-export async function getAllBooks() {
-  try {
-    const res = await api.get("/books"); // backend /books is permitAll
-    return res.data;
-  } catch (err) {
-    console.error("Error fetching public books:", err);
-    throw err;
-  }
-}
+// Public endpoints
+export const getAllPublicBooks = async () => {
+  const response = await api.get("/books");
+  return response.data;
+};
+export const getBookById = async (id) => {
+  const response = await api.get(`/books/${id}`);
+  return response.data;
+};
 
-// Protected CRUD endpoints
-export async function createBook(book) {
-  const res = await api.post("/books", book);
-  return res.data;
-}
-
-export async function updateBook(bookId, book) {
-  const res = await api.put(`/books/${bookId}`, book);
-  return res.data;
-}
-
-export async function deleteBook(bookId) {
-  const res = await api.delete(`/books/${bookId}`);
-  return res.data;
-}
+// Librarian-only endpoints
+export const getAllBooks = async () => {
+  const response = await api.get("/books");
+  return response.data;
+};
+export const createBook = async (book) => {
+  const response = await api.post("/books", book);
+  return response.data;
+};
+export const updateBook = async (id, book) => {
+  const response = await api.put(`/books/${id}`, book);
+  return response.data;
+};
+export const deleteBook = async (id) => {
+  await api.delete(`/books/${id}`);
+};

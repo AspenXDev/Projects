@@ -1,8 +1,7 @@
-import { api } from "./api";
+// path: Frontend/src/services/UserService.js
+import { api } from "./api.js";
 
-export const UserService = {
-  getCurrentUser: async () => {
-    const response = await api.get("/users/me");
-    return response.data;
-  },
+export const getCurrentUser = async () => {
+  const response = await api.get("/users/me");
+  return response.data;
 };

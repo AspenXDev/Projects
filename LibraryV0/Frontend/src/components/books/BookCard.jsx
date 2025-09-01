@@ -2,38 +2,37 @@
 import React from "react";
 import "../../styling/BookCard.css";
 
-export const BookCard = ({ book, dueDate, renewCount, status }) => {
+export function BookCard({ book, dueDate, renewCount, status, overdue }) {
   if (!book) return null;
 
+  // Determine availability from book.status or prop status
+  const availability =
+    book.status === "Available" || status === "Available"
+      ? "Available"
+      : book.status || status || "Unavailable";
+
   return (
-    <div className="book-card">
-      <h3 className="book-card__title">{book.title}</h3>
+    <div
+      className={`book-card ${
+        availability === "Available" ? "available" : "unavailable"
+      }`}
+    >
+      <h3>{book?.title ?? book?.name ?? "Untitled"}</h3>
+      <p>Author: {book?.author ?? "—"}</p>
       <p>
-        Author: <strong>{book.author}</strong>
+        Location: Section {book?.locationSection ?? "—"}, Shelf{" "}
+        {book?.locationShelf ?? "—"}, Row {book?.locationRow ?? "—"}
       </p>
       <p>
-        ISBN: <strong>{book.isbn}</strong>
+        Status: <strong>{availability}</strong>
       </p>
 
-      {(dueDate || status || typeof renewCount === "number") && (
-        <div className="book-card__loan-meta">
-          {status && (
-            <p className="status">
-              Status: <strong>{status}</strong>
-            </p>
-          )}
-          {dueDate && (
-            <p>
-              Due: <strong>{new Date(dueDate).toLocaleDateString()}</strong>
-            </p>
-          )}
-          {typeof renewCount === "number" && (
-            <p>
-              Renewals: <strong>{renewCount}</strong>
-            </p>
-          )}
-        </div>
+      {/* Loan info if provided */}
+      {typeof dueDate !== "undefined" && dueDate && (
+        <p>Due: {new Date(dueDate).toLocaleDateString()}</p>
       )}
+      {typeof renewCount !== "undefined" && <p>Renewals: {renewCount}</p>}
+      {overdue && <p style={{ color: "crimson", fontWeight: 700 }}>Overdue</p>}
     </div>
   );
-};
+}

@@ -1,12 +1,11 @@
-import { api } from "./api";
+// path: Frontend/src/services/LoanService.js
+import { api } from "./api.js";
 
-// Fetch all loans
 export const getAllLoans = async () => {
   const response = await api.get("/loans");
   return response.data;
 };
 
-// Fetch loans for a specific member by user ID
 export const getLoansByMemberId = async (memberId) => {
   const response = await api.get(`/loans/member/${memberId}`);
   return response.data;

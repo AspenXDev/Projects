@@ -1,39 +1,51 @@
-// src/pages/MemberDashboard.jsx
-import React, { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../contexts/AuthContext";
-import { getLoansByMemberId } from "../services/LoanService";
-import { getFinesByMemberId } from "../services/FineService";
-import { getMemberByUserId } from "../services/MemberService";
+// path: src/pages/MemberDashboard.jsx
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../contexts/AuthContext.jsx";
+import { getLoansByMemberId } from "../services/LoanService.js";
+import { getFinesByMemberId } from "../services/FineService.js";
+import { getMemberByUserId } from "../services/MemberService.js";
 import { BookCard } from "../components/books/BookCard.jsx";
 import "../styling/Dashboard.css";
 
 export const MemberDashboard = () => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const [member, setMember] = useState(null);
   const [loans, setLoans] = useState([]);
   const [fines, setFines] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user?.user_id) return;
+    if (!user?.userId) {
+      setLoading(false);
+      return;
+    }
 
-    Promise.all([
-      getMemberByUserId(user.user_id).then(setMember).catch(console.error),
-      getLoansByMemberId(user.user_id)
-        .then((res) => setLoans(res || []))
-        .catch(console.error),
-      getFinesByMemberId(user.user_id)
-        .then((res) => setFines(res || []))
-        .catch(console.error),
-    ]).finally(() => setLoading(false));
+    setLoading(true);
+
+    Promise.allSettled([
+      getMemberByUserId(user.userId),
+      getLoansByMemberId(user.userId),
+      getFinesByMemberId(user.userId),
+    ])
+      .then((results) => {
+        const [mRes, loansRes, finesRes] = results;
+        if (mRes.status === "fulfilled") setMember(mRes.value);
+        if (loansRes.status === "fulfilled")
+          setLoans(Array.isArray(loansRes.value) ? loansRes.value : []);
+        if (finesRes.status === "fulfilled")
+          setFines(Array.isArray(finesRes.value) ? finesRes.value : []);
+      })
+      .catch((e) => console.error("MemberDashboard fetch error", e))
+      .finally(() => setLoading(false));
   }, [user]);
 
-  const totalUnpaidFines = fines.reduce(
-    (sum, f) => (!f.paid ? sum + Number(f.amount || 0) : sum),
-    0
-  );
-  const overdueLoans = loans.filter(
-    (l) => l.status === "Active" && new Date(l.dueDate) < new Date()
+  const totalUnpaidFines = (fines || [])
+    .filter((f) => !f.paid)
+    .reduce((sum, f) => sum + Number(f.amount || 0), 0);
+
+  const activeLoans = (loans || []).filter((l) => l.status === "Active");
+  const overdueLoans = activeLoans.filter(
+    (l) => new Date(l.dueDate) < new Date()
   );
 
   return (
@@ -44,7 +56,7 @@ export const MemberDashboard = () => {
         <div className="card">
           <h3>Membership</h3>
           <p>
-            Status: <strong>{member?.membershipStatus || "—"}</strong>
+            Status: <strong>{member?.membershipStatus ?? "—"}</strong>
           </p>
           <p>
             Valid Until:{" "}
@@ -66,12 +78,11 @@ export const MemberDashboard = () => {
         <div className="card">
           <h3>Loans</h3>
           <p>
-            Active:{" "}
-            <strong>{loans.filter((l) => l.status === "Active").length}</strong>
+            Active: <strong>{activeLoans.length}</strong>
           </p>
           <p>
             Overdue:{" "}
-            <strong style={{ color: "red" }}>{overdueLoans.length}</strong>
+            <strong style={{ color: "crimson" }}>{overdueLoans.length}</strong>
           </p>
         </div>
       </section>
@@ -80,11 +91,11 @@ export const MemberDashboard = () => {
         <h3>Your Active Loans</h3>
         {loading ? (
           <p className="muted">Loading…</p>
-        ) : loans.length === 0 ? (
+        ) : activeLoans.length === 0 ? (
           <p className="muted">No active loans.</p>
         ) : (
           <div className="books-grid">
-            {loans.map((loan) => (
+            {activeLoans.map((loan) => (
               <BookCard
                 key={loan.loanId}
                 book={loan.book}
@@ -97,6 +108,20 @@ export const MemberDashboard = () => {
           </div>
         )}
       </section>
+
+      {overdueLoans.length > 0 && (
+        <section className="overdue-section" style={{ marginTop: 20 }}>
+          <h3 style={{ color: "crimson" }}>⚠️ Overdue Loans</h3>
+          <ul>
+            {overdueLoans.map((l) => (
+              <li key={l.loanId}>
+                {l.book?.title ?? "Untitled"} — due{" "}
+                {new Date(l.dueDate).toLocaleDateString()}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 };

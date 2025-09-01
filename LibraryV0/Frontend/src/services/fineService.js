@@ -1,4 +1,5 @@
-import { api } from "./api";
+// path: Frontend/src/services/FineService.js
+import { api } from "./api.js";
 
 export const getAllFines = async () => {
   const response = await api.get("/fines");

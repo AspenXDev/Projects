@@ -1,32 +1,106 @@
-// PATH: src/pages/LandingPage.jsx
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// path : Frontend/src/pages/LandingPage.jsx
+import React, { useEffect, useState } from "react";
+import { getAllBooks } from "../services/BookService.js";
+import { useAuth } from "../contexts/AuthContext.jsx";
+import { BookCard } from "../components/books/BookCard.jsx";
 import "../styling/LandingPage.css";
-import { BooksPublicList } from "../components/books/BooksPublicList.jsx";
-import { AuthProvider, useAuth } from "../contexts/AuthContext.jsx";
 
-export function LandingPage() {
-  const navigate = useNavigate();
+const unwrap = (r) => (r && r.data !== undefined ? r.data : r);
+
+export const LandingPage = () => {
+  const { user, logout } = useAuth();
+  const [books, setBooks] = useState([]);
+  const [featured, setFeatured] = useState([]);
+  const [search, setSearch] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
+
+  useEffect(() => {
+    getAllBooks()
+      .then(unwrap)
+      .then((data) => {
+        setBooks(data || []);
+        if (data?.length > 3) {
+          const shuffled = [...data].sort(() => 0.5 - Math.random());
+          setFeatured(shuffled.slice(0, 3));
+        } else {
+          setFeatured(data);
+        }
+      })
+      .catch((err) => console.error("Error fetching books:", err));
+  }, []);
+
+  const filteredBooks = books.filter(
+    (b) =>
+      (!search || b.title.toLowerCase().includes(search.toLowerCase())) &&
+      (!filterCategory ||
+        (b.category ?? "").toLowerCase() === filterCategory.toLowerCase())
+  );
+
+  const categories = Array.from(
+    new Set(books.map((b) => b.category).filter(Boolean))
+  );
+
   return (
-    <div className="landing-page" style={{ padding: 20 }}>
-      <header style={{ display: "flex", justifyContent: "space-between" }}>
-        <h1>Library</h1>
-        <div>
-          <button onClick={() => navigate("/login")}>Login</button>
-          <button onClick={() => navigate("/books")} style={{ marginLeft: 8 }}>
-            Browse Books
+    <div className="landing-container">
+      <header className="landing-header">
+        <h1>Welcome to the Library</h1>
+        {!user ? (
+          <button
+            className="login-btn"
+            onClick={() => (window.location.href = "/login")}
+          >
+            Login
           </button>
-        </div>
+        ) : (
+          <button className="login-btn" onClick={logout}>
+            Logout
+          </button>
+        )}
       </header>
 
-      <section style={{ marginTop: 16 }}>
-        <h2>Explore our collection</h2>
-        <p>Browse books and magazines. Scroll to load more.</p>
+      <section className="search-filter">
+        <input
+          type="text"
+          placeholder="Search by title..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <select
+          value={filterCategory}
+          onChange={(e) => setFilterCategory(e.target.value)}
+        >
+          <option value="">All Categories</option>
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
       </section>
 
-      <main style={{ marginTop: 24 }}>
-        <BooksPublicList />
-      </main>
+      {featured.length > 0 && (
+        <section className="featured-books">
+          <h2>New In</h2>
+          <div className="books-grid">
+            {featured.map((book) => (
+              <BookCard key={book.bookId} book={book} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className="all-books">
+        <h2>All Books</h2>
+        {filteredBooks.length === 0 ? (
+          <p className="muted">No books found.</p>
+        ) : (
+          <div className="books-grid">
+            {filteredBooks.map((book) => (
+              <BookCard key={book.bookId} book={book} />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
-}
+};

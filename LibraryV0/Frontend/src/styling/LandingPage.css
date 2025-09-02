@@ -1,4 +1,4 @@
-// path: Frontend/src/pages/LandingPage.jsximport React, { useEffect, useState } from "react";
+/* // path: Frontend/src/pages/LandingPage.jsximport React, { useEffect, useState } from "react";
 import { getAllBooks } from "../services/BookService.js";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { BookCard } from "../components/books/BookCard.jsx";
@@ -41,7 +41,7 @@ export function LandingPage() {
     return titleMatch && categoryMatch;
   });
 
-  return (
+  return ( */
     <div className="landing-container">
       <header className="landing-header">
         <h1>Welcome to the Library</h1>

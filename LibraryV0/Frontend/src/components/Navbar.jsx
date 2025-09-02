@@ -22,21 +22,36 @@ export default function Navbar() {
       <div style={{ fontWeight: 700, color: "#003366" }}>
         {user ? `Welcome, ${user.username}` : "Library App"}
       </div>
-      <div>
+      <div style={{ display: "flex", gap: "8px" }}>
         {!user ? (
-          <button
-            style={{
-              padding: "6px 12px",
-              backgroundColor: "#003366",
-              color: "#fff",
-              border: "none",
-              borderRadius: 4,
-              cursor: "pointer",
-            }}
-            onClick={() => navigate("/login")}
-          >
-            Login
-          </button>
+          <>
+            <button
+              style={{
+                padding: "6px 12px",
+                backgroundColor: "#003366",
+                color: "#fff",
+                border: "none",
+                borderRadius: 4,
+                cursor: "pointer",
+              }}
+              onClick={() => navigate("/login")}
+            >
+              Login
+            </button>
+            <button
+              style={{
+                padding: "6px 12px",
+                backgroundColor: "#0077cc",
+                color: "#fff",
+                border: "none",
+                borderRadius: 4,
+                cursor: "pointer",
+              }}
+              onClick={() => navigate("/register")}
+            >
+              Register
+            </button>
+          </>
         ) : (
           <LogOutButton />
         )}

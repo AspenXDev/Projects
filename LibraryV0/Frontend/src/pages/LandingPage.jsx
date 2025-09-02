@@ -9,7 +9,10 @@ const unwrap = (r) => (r && r.data !== undefined ? r.data : r);
 export function LandingPage() {
   const [books, setBooks] = useState([]);
   const [featured, setFeatured] = useState([]);
-  const [search, setSearch] = useState("");
+
+  const [searchTitle, setSearchTitle] = useState("");
+  const [searchAuthor, setSearchAuthor] = useState("");
+  const [searchISBN, setSearchISBN] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
 
   useEffect(() => {
@@ -19,7 +22,7 @@ export function LandingPage() {
         const list = Array.isArray(data) ? data : [];
         setBooks(list);
 
-        // Fixed New Arrivals by title (choose three stable titles that exist)
+        // Featured section → fixed list of "new arrivals"
         const chosenTitles = [
           "Pride and Prejudice",
           "1984",
@@ -41,11 +44,18 @@ export function LandingPage() {
 
   const filteredBooks = (books || []).filter((b) => {
     const titleMatch =
-      !search || (b.title || "").toLowerCase().includes(search.toLowerCase());
+      !searchTitle ||
+      (b.title || "").toLowerCase().includes(searchTitle.toLowerCase());
+    const authorMatch =
+      !searchAuthor ||
+      (b.author || "").toLowerCase().includes(searchAuthor.toLowerCase());
+    const isbnMatch =
+      !searchISBN ||
+      (b.isbn || "").toLowerCase().includes(searchISBN.toLowerCase());
     const categoryMatch =
       !filterCategory ||
       (b.category || "").toLowerCase() === filterCategory.toLowerCase();
-    return titleMatch && categoryMatch;
+    return titleMatch && authorMatch && isbnMatch && categoryMatch;
   });
 
   return (
@@ -54,17 +64,40 @@ export function LandingPage() {
         <h1>Welcome to the Library</h1>
       </header>
 
+      {/* ========================= */}
+      {/* Search Filters */}
+      {/* ========================= */}
       <section className="search-filter">
         <input
           aria-label="Search books by title"
           type="text"
           placeholder="Search by title..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={searchTitle}
+          onChange={(e) => setSearchTitle(e.target.value)}
         />
+
+        <input
+          aria-label="Search books by author"
+          type="text"
+          placeholder="Search by author..."
+          value={searchAuthor}
+          onChange={(e) => setSearchAuthor(e.target.value)}
+          style={{ marginTop: 8 }}
+        />
+
+        <input
+          aria-label="Search books by ISBN"
+          type="text"
+          placeholder="Search by ISBN..."
+          value={searchISBN}
+          onChange={(e) => setSearchISBN(e.target.value)}
+          style={{ marginTop: 8 }}
+        />
+
         <select
           value={filterCategory}
           onChange={(e) => setFilterCategory(e.target.value)}
+          style={{ marginTop: 8 }}
         >
           <option value="">All Categories</option>
           {categories.map((cat) => (
@@ -75,6 +108,9 @@ export function LandingPage() {
         </select>
       </section>
 
+      {/* ========================= */}
+      {/* Featured Books */}
+      {/* ========================= */}
       {featured.length > 0 && (
         <section className="featured-books">
           <h2>New Arrivals</h2>
@@ -92,6 +128,9 @@ export function LandingPage() {
         </section>
       )}
 
+      {/* ========================= */}
+      {/* All Books */}
+      {/* ========================= */}
       <section className="all-books" style={{ marginTop: 24 }}>
         <h2>All Books</h2>
         {filteredBooks.length === 0 ? (

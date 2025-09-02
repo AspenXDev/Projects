@@ -3,6 +3,7 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { LandingPage } from "./pages/LandingPage.jsx";
 import { LoginPage } from "./components/auth/LoginPage.jsx";
+import { RegisterPage } from "./components/auth/RegisterPage.jsx";
 import { MemberDashboard } from "./pages/MemberDashboard.jsx";
 import { LibrarianDashboard } from "./pages/LibrarianDashboard.jsx";
 import { Books } from "./pages/Books.jsx";
@@ -26,6 +27,14 @@ export default function App() {
         element={
           <Layout>
             <LoginPage />
+          </Layout>
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <Layout>
+            <RegisterPage />
           </Layout>
         }
       />

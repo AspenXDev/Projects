@@ -1,15 +1,19 @@
 package com.library.lms.service.impl;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.library.lms.model.Loan;
 import com.library.lms.model.enums.LoanStatus;
 import com.library.lms.repository.LoanRepository;
 import com.library.lms.service.LoanService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class LoanServiceImpl implements LoanService {
 
     private final LoanRepository loanRepository;
@@ -20,20 +24,22 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public Loan borrowBook(Integer memberId, Integer bookId) {
-        // implement borrowing logic here
-        throw new UnsupportedOperationException("Implement borrow logic");
+        throw new UnsupportedOperationException("Borrow logic will be implemented in Batch #3");
     }
 
     @Override
     public Loan returnBook(Integer loanId) {
-        // implement return logic here
-        throw new UnsupportedOperationException("Implement return logic");
+        throw new UnsupportedOperationException("Return logic will be implemented in Batch #3");
     }
 
     @Override
     public Loan renewLoan(Integer loanId) {
-        // implement renewal logic here
-        throw new UnsupportedOperationException("Implement renew logic");
+        throw new UnsupportedOperationException("Renew logic will be implemented in Batch #3");
+    }
+
+    @Override
+    public Optional<Loan> getLoanById(Integer loanId) {
+        return loanRepository.findById(loanId);
     }
 
     @Override
@@ -49,5 +55,25 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public List<Loan> getLoansByStatus(LoanStatus status) {
         return loanRepository.findByStatus(status);
+    }
+
+    @Override
+    public List<Loan> getAllLoans() {
+        return loanRepository.findAll();
+    }
+
+    @Override
+    public List<Loan> findActiveLoansByUserId(Integer userId) {
+        return loanRepository.findByMemberUserUserIdAndStatus(userId, LoanStatus.Active);
+    }
+
+    @Override
+    public List<Loan> findOverdueLoansByUserId(Integer userId) {
+        LocalDate today = LocalDate.now();
+        return loanRepository.findByMemberUserUserIdAndStatus(userId, LoanStatus.Active)
+                .stream()
+                .filter(loan -> loan.getDueDate() != null && loan.getDueDate().isBefore(today))
+                .peek(loan -> loan.setStatus(LoanStatus.Overdue))
+                .collect(Collectors.toList());
     }
 }

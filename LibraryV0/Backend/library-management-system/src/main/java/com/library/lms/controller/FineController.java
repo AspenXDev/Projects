@@ -1,6 +1,8 @@
 package com.library.lms.controller;
 
 import com.library.lms.model.Fine;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import com.library.lms.service.FineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -53,5 +55,12 @@ public class FineController {
     public ResponseEntity<Void> deleteFine(@PathVariable Integer id) {
         fineService.deleteFine(id);
         return ResponseEntity.noContent().build();
+    }
+    
+    @GetMapping("/my")
+    @PreAuthorize("hasRole('MEMBER')")
+    public ResponseEntity<List<Fine>> getMyFines(Authentication auth) {
+        String username = auth.getName();
+        return ResponseEntity.ok(fineService.getFinesByUsername(username));
     }
 }

@@ -104,8 +104,8 @@ CREATE TABLE loans (
     due_date DATE NOT NULL,
     return_date DATE,
     renew_count INT DEFAULT 0,
-	status ENUM('Active', 'Returned') DEFAULT 'Active',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('Active','Returned','Overdue') DEFAULT 'Active',
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (member_id) REFERENCES members(member_id),
     FOREIGN KEY (book_id) REFERENCES books(book_id)

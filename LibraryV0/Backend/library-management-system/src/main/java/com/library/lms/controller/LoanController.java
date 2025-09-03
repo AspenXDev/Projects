@@ -68,16 +68,36 @@ public class LoanController {
     @GetMapping("/my")
     @PreAuthorize("hasRole('MEMBER')")
     public ResponseEntity<List<Loan>> getMyLoans(Authentication auth) {
-        // Unwrap Optional<User>
-    	User user = userService.getUserByUsername(username)
+        String username = auth.getName();
+
+        User user = userService.getUserByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-
-        // Unwrap Optional<Member>
         Member member = memberService.getMemberByUserId(user.getUserId())
                 .orElseThrow(() -> new RuntimeException("Member not found"));
 
         List<Loan> loans = loanService.getLoansByMemberId(member.getMemberId());
         return ResponseEntity.ok(loans);
     }
+
+    @GetMapping("/my/active")
+    @PreAuthorize("hasRole('MEMBER')")
+    public ResponseEntity<List<Loan>> getMyActiveLoans(Authentication auth) {
+        String username = auth.getName();
+        User user = userService.getUserByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return ResponseEntity.ok(loanService.findActiveLoansByUserId(user.getUserId()));
+    }
+
+    @GetMapping("/my/overdue")
+    @PreAuthorize("hasRole('MEMBER')")
+    public ResponseEntity<List<Loan>> getMyOverdueLoans(Authentication auth) {
+        String username = auth.getName();
+        User user = userService.getUserByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return ResponseEntity.ok(loanService.findOverdueLoansByUserId(user.getUserId()));
+    }
+
 }

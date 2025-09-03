@@ -1,6 +1,8 @@
 package com.library.lms.controller;
 
 import com.library.lms.model.Member;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import com.library.lms.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -42,5 +44,14 @@ public class MemberController {
     public ResponseEntity<Void> deleteMember(@PathVariable Integer id) {
         memberService.deleteMember(id);
         return ResponseEntity.noContent().build();
+    }
+    
+    @GetMapping("/my")
+    @PreAuthorize("hasRole('MEMBER')")
+    public ResponseEntity<Member> getMyProfile(Authentication auth) {
+        String username = auth.getName();
+        return memberService.getMemberByUsername(username)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new RuntimeException("Member not found"));
     }
 }

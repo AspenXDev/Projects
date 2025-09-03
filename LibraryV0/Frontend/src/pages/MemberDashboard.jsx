@@ -1,4 +1,3 @@
-// path: Frontend/src/pages/MemberDashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { getMyLoans } from "../services/LoanService.js";
@@ -20,7 +19,8 @@ export const MemberDashboard = () => {
     setLoading(true);
     Promise.allSettled([getMyMemberInfo(), getMyLoans(), getMyFines()])
       .then(([memberRes, loansRes, finesRes]) => {
-        if (memberRes.status === "fulfilled") setMember(memberRes.value);
+        if (memberRes.status === "fulfilled")
+          setMember(memberRes.value || null);
         if (loansRes.status === "fulfilled") setLoans(loansRes.value || []);
         if (finesRes.status === "fulfilled") setFines(finesRes.value || []);
       })
@@ -28,17 +28,14 @@ export const MemberDashboard = () => {
       .finally(() => setLoading(false));
   }, [user]);
 
-  // Derived fields
   const totalUnpaidFines = fines.reduce(
     (sum, f) => sum + Number(f.amount || 0),
     0
   );
-
   const activeLoans = loans.filter((l) => l.status === "Active");
   const overdueLoans = activeLoans.filter(
     (l) => new Date(l.dueDate) < new Date()
   );
-
   const membershipValid =
     member?.membershipValidUntil &&
     new Date(member.membershipValidUntil) > new Date();

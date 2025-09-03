@@ -1,9 +1,10 @@
 package com.library.lms.model;
 
+import com.library.lms.model.enums.LoanStatus;
+import com.library.lms.model.converters.LoanStatusConverter;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import com.library.lms.model.enums.LoanStatus;
 
 @Entity
 @Table(name = "loans")
@@ -34,7 +35,7 @@ public class Loan {
     @Column(name = "renew_count")
     private Integer renewCount = 0;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = LoanStatusConverter.class)
     @Column(name = "status", nullable = false)
     private LoanStatus status = LoanStatus.Active;
 

@@ -2,7 +2,8 @@ package com.library.lms.model.enums;
 
 public enum LoanStatus {
     Active("Active"),
-    Returned("Returned");
+    Returned("Returned"),
+    Overdue("Overdue");  // was missing earlier...
 
     private final String dbValue;
 
@@ -16,7 +17,7 @@ public enum LoanStatus {
 
     public static LoanStatus fromDb(String v) {
         for (LoanStatus s : values()) {
-            if (s.dbValue.equals(v)) return s;
+            if (s.dbValue.equalsIgnoreCase(v)) return s;
         }
         throw new IllegalArgumentException("Unknown loan status: " + v);
     }

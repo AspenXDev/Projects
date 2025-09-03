@@ -1,3 +1,4 @@
+// PATH: src/main/java/com/library/lms/auth/JwtAuthenticationFilter.java
 package com.library.lms.auth;
 
 import jakarta.servlet.FilterChain;
@@ -7,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,21 +16,23 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 
 /**
  * JWT filter that authenticates requests with JWT tokens.
  * Skips authentication for /auth/** endpoints (login, register, reset password, etc.).
+ * Normalizes whatever role claim is inside the token (like "Librarians" or "Members") into Spring’s expected "ROLE_LIBRARIAN" / "ROLE_MEMBER" authority.
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
-    private final JwtUtil jwtUtil;
+    private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
-        this.jwtUtil = jwtUtil;
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
+        this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = userDetailsService;
     }
 
@@ -49,12 +53,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Check Authorization header
         String authHeader = request.getHeader("Authorization");
-        String username = null;
         String token = null;
+        String username = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            username = jwtUtil.getUsernameFromToken(token);
+            username = jwtTokenProvider.getUsernameFromToken(token);
             logger.debug("Extracted token for user: {}", username);
         } else {
             logger.debug("No Bearer token found in Authorization header");
@@ -62,24 +66,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Validate token and set authentication context
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            logger.debug("No authentication in context, loading user: {}", username);
-
             try {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                if (jwtUtil.validateToken(token, userDetails)) {
-                    logger.debug("JWT token validated successfully for user: {}", username);
+                // Extract role from token and normalize
+                String roleClaim = (String) io.jsonwebtoken.Jwts.parser()
+                        .setSigningKey("mySuperSecretKey1234567890mySuperSecretKey1234567890mySuperSecretKey1234567890mySuperSecretKey1234567890mySuperSecretKey1234567890")
+                        .parseClaimsJws(token)
+                        .getBody()
+                        .get("role");
+
+                String mappedRole = mapRole(roleClaim);
+
+                if (mappedRole != null) {
+                    logger.debug("Mapped role '{}' to authority '{}'", roleClaim, mappedRole);
 
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
                                     userDetails,
                                     null,
-                                    userDetails.getAuthorities()
+                                    Collections.singletonList(new SimpleGrantedAuthority(mappedRole))
                             );
+
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 } else {
-                    logger.debug("JWT token validation failed for user: {}", username);
+                    logger.debug("No valid role claim found in token");
                 }
+
             } catch (Exception e) {
                 logger.debug("Exception while validating JWT for user {}: {}", username, e.getMessage());
             }
@@ -93,5 +106,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Continue the filter chain
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * Normalizes DB role names like "Librarians" or "Members" into Spring Security format.
+     * Example: "Librarians" -> "ROLE_LIBRARIAN"
+     */
+    private String mapRole(String roleClaim) {
+        if (roleClaim == null) return null;
+        String normalized = roleClaim.trim();
+
+        // strip plural s
+        if (normalized.endsWith("s")) {
+            normalized = normalized.substring(0, normalized.length() - 1);
+        }
+
+        return "ROLE_" + normalized.toUpperCase();
     }
 }

@@ -4,8 +4,8 @@ import com.library.lms.auth.JwtTokenProvider;
 import com.library.lms.dto.AuthRequest;
 import com.library.lms.dto.AuthResponse;
 import com.library.lms.dto.RegistrationRequest;
-import com.library.lms.model.Member;
 import com.library.lms.model.Librarian;
+import com.library.lms.model.Member;
 import com.library.lms.model.Role;
 import com.library.lms.model.User;
 import com.library.lms.service.LibrarianService;
@@ -48,17 +48,17 @@ public class AuthController {
             return ResponseEntity.badRequest().body(new AuthResponse("username and password required"));
         }
 
-        try {
-            User user = userService.authenticate(request.getUsername(), request.getPassword())
-                    .orElseThrow(() -> new RuntimeException("Invalid credentials"));
-
-            String fullName = deriveFullNameForUser(user);
-            String token = jwtTokenProvider.generateToken(user);
-
-            return ResponseEntity.ok(new AuthResponse(user, fullName, token));
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(ex.getMessage()));
+        // Use authenticate method from UserService
+        User user = userService.authenticate(request.getUsername(), request.getPassword());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponse("Invalid credentials"));
         }
+
+        String fullName = deriveFullNameForUser(user);
+        String token = jwtTokenProvider.generateToken(user);
+
+        return ResponseEntity.ok(new AuthResponse(user, fullName, token));
     }
 
     @PostMapping("/register")
@@ -68,23 +68,30 @@ public class AuthController {
                 || !StringUtils.hasText(request.getEmail())
                 || !StringUtils.hasText(request.getPassword())
                 || !StringUtils.hasText(request.getFullName())) {
-            return ResponseEntity.badRequest().body(new AuthResponse("username, email, password, fullName are required"));
+            return ResponseEntity.badRequest().body(new AuthResponse(
+                    "username, email, password, fullName are required"));
         }
 
         if (userService.existsByUsername(request.getUsername())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new AuthResponse("Username already exists"));
-        }
-        if (userService.existsByEmail(request.getEmail())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new AuthResponse("Email already exists"));
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new AuthResponse("Username already exists"));
         }
 
-        Role membersRole = userService.getRoleByName("Members")
-                .orElseThrow(() -> new RuntimeException("Server misconfigured: Members role not found"));
+        if (userService.existsByEmail(request.getEmail())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new AuthResponse("Email already exists"));
+        }
+
+        Role membersRole = userService.getRoleByName("Members");
+        if (membersRole == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AuthResponse("Server misconfigured: Members role not found"));
+        }
 
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPasswordHash(request.getPassword());
+        user.setPasswordHash(request.getPassword()); // plain save; actual hashing can be handled inside UserService
         user.setRole(membersRole);
         user.setIsActive(true);
 
@@ -107,14 +114,17 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<AuthResponse> me(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse("Missing token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponse("Missing token"));
         }
         String token = authHeader.substring("Bearer ".length());
         String username = jwtTokenProvider.getUsernameFromToken(token);
 
-        User user = userService.getUserByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
+        User user = userService.getUserByUsername(username).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponse("User not found"));
+        }
 
         String fullName = deriveFullNameForUser(user);
         return ResponseEntity.ok(new AuthResponse(user, fullName, token));
@@ -127,15 +137,14 @@ public class AuthController {
 
         try {
             if ("Members".equalsIgnoreCase(roleName)) {
-                Member m = memberService.getMemberByUserId(user.getUserId())
-                        .orElseThrow(() -> new RuntimeException("Member not found"));
-                return m.getFullName();
+                Member m = memberService.getMemberByUserId(user.getUserId()).orElse(null);
+                return m != null ? m.getFullName() : null;
             } else if ("Librarians".equalsIgnoreCase(roleName)) {
-                Librarian l = librarianService.getLibrarianByUserId(user.getUserId())
-                        .orElseThrow(() -> new RuntimeException("Librarian not found"));
-                return l.getFullName();
+                Librarian l = librarianService.getLibrarianByUserId(user.getUserId()).orElse(null);
+                return l != null ? l.getFullName() : null;
             }
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
         return null;
     }
 }

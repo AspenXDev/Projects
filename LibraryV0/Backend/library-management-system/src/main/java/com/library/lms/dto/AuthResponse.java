@@ -1,4 +1,3 @@
-// PATH: src/main/java/com/library/lms/dto/AuthResponse.java
 package com.library.lms.dto;
 
 import com.library.lms.model.Role;
@@ -7,18 +6,20 @@ import com.library.lms.model.User;
 public class AuthResponse {
 
     private String username;
+    private String fullName;
     private String role;
     private String token;
-    private String message; // for error messages
+    private String message; // error message
 
     public AuthResponse() {}
 
-    // Success constructor
-    public AuthResponse(User user, String token) {
+    // Success constructor: user object + derived fullName + token
+    public AuthResponse(User user, String fullName, String token) {
         if (user != null) {
             this.username = user.getUsername();
+            this.fullName = fullName;
             Role roleObj = user.getRole();
-            this.role = roleObj != null ? roleObj.getRoleName() : null;
+            this.role = (roleObj != null ? roleObj.getRoleName() : null);
         }
         this.token = token;
     }
@@ -31,6 +32,9 @@ public class AuthResponse {
     // --- Getters & Setters ---
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
+
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }

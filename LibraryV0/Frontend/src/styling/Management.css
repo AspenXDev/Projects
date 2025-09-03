@@ -1,0 +1,94 @@
+/* path: Frontend/src/styling/Management.css */
+.management-container {
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 16px;
+  font-family: Arial, sans-serif;
+}
+
+.book-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.book-form input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.book-form button {
+  background: #2a72d4;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.book-form button:hover {
+  background: #1e57a4;
+}
+
+.book-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.book-table th,
+.book-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.book-table th {
+  background: #f2f2f2;
+}
+
+.book-table button {
+  margin-right: 6px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.book-table button:first-child {
+  background: #f0ad4e;
+  color: white;
+}
+
+.book-table button:last-child {
+  background: #d9534f;
+  color: white;
+}
+
+.muted {
+  color: #888;
+  font-style: italic;
+}
+
+.management-links {
+  margin: 20px 0;
+}
+
+.link-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  display: inline-block;
+  background: #2a72d4;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: #1e57a4;
+}

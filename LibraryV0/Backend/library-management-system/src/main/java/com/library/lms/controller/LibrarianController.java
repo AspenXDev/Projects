@@ -1,47 +1,53 @@
 package com.library.lms.controller;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.*;
-
 import com.library.lms.model.Librarian;
 import com.library.lms.service.LibrarianService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/librarians")
+@CrossOrigin(origins = "http://localhost:5173")
 public class LibrarianController {
 
-    private final LibrarianService librarianService;
-
-    public LibrarianController(LibrarianService librarianService) {
-        this.librarianService = librarianService;
-    }
-
-    // ======================
-    // CRUD Endpoints
-    // ======================
-    @PostMapping
-    public Librarian createLibrarian(@RequestBody Librarian librarian) {
-        return librarianService.createLibrarian(librarian);
-    }
+    @Autowired
+    private LibrarianService librarianService;
 
     @GetMapping("/{id}")
-    public Librarian getLibrarianById(@PathVariable Integer id) {
-        return librarianService.getLibrarianById(id);
+    public ResponseEntity<Librarian> getLibrarian(@PathVariable Integer id) {
+        Librarian librarian = librarianService.getLibrarianById(id)
+                .orElseThrow(() -> new RuntimeException("Librarian not found"));
+        return ResponseEntity.ok(librarian);
+    }
+
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<Librarian> getByUserId(@PathVariable Integer userId) {
+        Librarian librarian = librarianService.getLibrarianByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Librarian not found"));
+        return ResponseEntity.ok(librarian);
     }
 
     @GetMapping
-    public List<Librarian> getAllLibrarians() {
-        return librarianService.getAllLibrarians();
+    public ResponseEntity<List<Librarian>> getAllLibrarians() {
+        return ResponseEntity.ok(librarianService.getAllLibrarians());
+    }
+
+    @PostMapping
+    public ResponseEntity<Librarian> createLibrarian(@RequestBody Librarian librarian) {
+        return ResponseEntity.ok(librarianService.createLibrarian(librarian));
     }
 
     @PutMapping("/{id}")
-    public Librarian updateLibrarian(@PathVariable Integer id, @RequestBody Librarian librarian) {
-        return librarianService.updateLibrarian(id, librarian);
+    public ResponseEntity<Librarian> updateLibrarian(@PathVariable Integer id, @RequestBody Librarian librarian) {
+        return ResponseEntity.ok(librarianService.updateLibrarian(id, librarian));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteLibrarian(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteLibrarian(@PathVariable Integer id) {
         librarianService.deleteLibrarian(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,68 +1,57 @@
 package com.library.lms.controller;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.*;
-
 import com.library.lms.model.Fine;
 import com.library.lms.service.FineService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/fines")
-@CrossOrigin(origins = "*") // allow React frontend
+@CrossOrigin(origins = "http://localhost:5173")
 public class FineController {
 
     private final FineService fineService;
 
+    @Autowired
     public FineController(FineService fineService) {
         this.fineService = fineService;
     }
 
-    // ======================
-    // CRUD Operations
-    // ======================
-
     @GetMapping
-    public List<Fine> getAllFines() {
-        return fineService.getAllFines();
+    public ResponseEntity<List<Fine>> getAllFines() {
+        return ResponseEntity.ok(fineService.getAllFines());
     }
 
     @GetMapping("/{id}")
-    public Fine getFineById(@PathVariable Integer id) {
-        return fineService.getFineById(id);
+    public ResponseEntity<Fine> getFineById(@PathVariable Integer id) {
+        Fine fine = fineService.getFineById(id)
+                .orElseThrow(() -> new RuntimeException("Fine not found"));
+        return ResponseEntity.ok(fine);
+    }
+
+    @GetMapping("/member/{memberId}/unpaid")
+    public ResponseEntity<List<Fine>> getUnpaidFinesByMember(@PathVariable Integer memberId) {
+        return ResponseEntity.ok(fineService.getUnpaidFinesByMemberId(memberId));
     }
 
     @PostMapping
-    public Fine createFine(@RequestBody Fine fine) {
-        return fineService.createFine(fine);
+    public ResponseEntity<Fine> createFine(@RequestBody Fine fine) {
+        Fine created = fineService.createFine(fine);
+        return ResponseEntity.status(201).body(created);
     }
 
     @PutMapping("/{id}")
-    public Fine updateFine(@PathVariable Integer id, @RequestBody Fine fineDetails) {
-        return fineService.updateFine(id, fineDetails);
+    public ResponseEntity<Fine> updateFine(@PathVariable Integer id, @RequestBody Fine fine) {
+        Fine updated = fineService.updateFine(id, fine);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteFine(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteFine(@PathVariable Integer id) {
         fineService.deleteFine(id);
-    }
-
-    // ======================
-    // Convenience Endpoints
-    // ======================
-
-    @GetMapping("/loan/{loanId}")
-    public List<Fine> getFinesByLoanId(@PathVariable Integer loanId) {
-        return fineService.getFinesByLoanId(loanId);
-    }
-
-    @GetMapping("/member/{memberId}")
-    public List<Fine> getFinesByMemberId(@PathVariable Integer memberId) {
-        return fineService.getFinesByMemberId(memberId);
-    }
-
-    @GetMapping("/status/{paid}")
-    public List<Fine> getFinesByPaidStatus(@PathVariable Boolean paid) {
-        return fineService.getFinesByPaidStatus(paid);
+        return ResponseEntity.noContent().build();
     }
 }

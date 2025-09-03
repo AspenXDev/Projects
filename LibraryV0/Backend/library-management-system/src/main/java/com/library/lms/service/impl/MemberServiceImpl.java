@@ -1,37 +1,35 @@
-// PATH: src/main/java/com/library/lms/service/impl/MemberServiceImpl.java
 package com.library.lms.service.impl;
 
 import com.library.lms.model.Member;
 import com.library.lms.model.User;
 import com.library.lms.repository.MemberRepository;
 import com.library.lms.service.MemberService;
-import com.library.lms.mapper.MapperFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MemberServiceImpl implements MemberService {
 
-    private final MemberRepository memberRepository;
-
-    public MemberServiceImpl(MemberRepository memberRepository) {
-        this.memberRepository = memberRepository;
-    }
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Override
     public Member createMember(Member member, User user) {
-        Member newMember = MapperFactory.toMember(member, user);
-        newMember.setRegistrationDate(LocalDate.now());
-        newMember.setMembershipValidUntil(LocalDate.now().plusYears(1));
-        return memberRepository.save(newMember);
+        member.setUser(user);
+        return memberRepository.save(member);
     }
 
     @Override
-    public Member getMemberById(Integer memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+    public Optional<Member> getMemberById(Integer memberId) {
+        return memberRepository.findById(memberId);
+    }
+
+    @Override
+    public Optional<Member> getMemberByUserId(Integer userId) {
+        return memberRepository.findByUser_UserId(userId);
     }
 
     @Override
@@ -41,8 +39,11 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member updateMember(Integer memberId, Member member) {
-        Member existing = getMemberById(memberId);
-        if (member.getFullName() != null) existing.setFullName(member.getFullName());
+        Member existing = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("Member not found"));
+        existing.setFullName(member.getFullName());
+        existing.setMembershipValidUntil(member.getMembershipValidUntil());
+        existing.setMembershipStatus(member.getMembershipStatus());
         return memberRepository.save(existing);
     }
 

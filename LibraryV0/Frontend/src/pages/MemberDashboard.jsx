@@ -1,9 +1,9 @@
 // path: Frontend/src/pages/MemberDashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext.jsx";
-import { getLoansByMemberId } from "../services/LoanService.js";
-import { getFinesByMemberId } from "../services/FineService.js";
-import { getMemberByUserId } from "../services/MemberService.js";
+import { getMyLoans } from "../services/LoanService.js";
+import { getMyFines } from "../services/FineService.js";
+import { getMyMemberInfo } from "../services/MemberService.js";
 import { BookCard } from "../components/books/BookCard.jsx";
 import "../styling/Dashboard.css";
 
@@ -15,48 +15,46 @@ export const MemberDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user?.userId) {
-      setLoading(false);
-      return;
-    }
+    if (!user) return;
 
     setLoading(true);
-
-    Promise.allSettled([
-      getMemberByUserId(user.userId),
-      getLoansByMemberId(user.userId),
-      getFinesByMemberId(user.userId),
-    ])
-      .then((results) => {
-        const [mRes, loansRes, finesRes] = results;
-        if (mRes.status === "fulfilled") setMember(mRes.value);
-        if (loansRes.status === "fulfilled")
-          setLoans(Array.isArray(loansRes.value) ? loansRes.value : []);
-        if (finesRes.status === "fulfilled")
-          setFines(Array.isArray(finesRes.value) ? finesRes.value : []);
+    Promise.allSettled([getMyMemberInfo(), getMyLoans(), getMyFines()])
+      .then(([memberRes, loansRes, finesRes]) => {
+        if (memberRes.status === "fulfilled") setMember(memberRes.value);
+        if (loansRes.status === "fulfilled") setLoans(loansRes.value || []);
+        if (finesRes.status === "fulfilled") setFines(finesRes.value || []);
       })
-      .catch((e) => console.error("MemberDashboard fetch error", e))
+      .catch(console.error)
       .finally(() => setLoading(false));
   }, [user]);
 
-  const totalUnpaidFines = (fines || [])
-    .filter((f) => !f.paid)
-    .reduce((sum, f) => sum + Number(f.amount || 0), 0);
+  // Derived fields
+  const totalUnpaidFines = fines.reduce(
+    (sum, f) => sum + Number(f.amount || 0),
+    0
+  );
 
-  const activeLoans = (loans || []).filter((l) => l.status === "Active");
+  const activeLoans = loans.filter((l) => l.status === "Active");
   const overdueLoans = activeLoans.filter(
     (l) => new Date(l.dueDate) < new Date()
   );
 
+  const membershipValid =
+    member?.membershipValidUntil &&
+    new Date(member.membershipValidUntil) > new Date();
+
   return (
     <div className="dashboard-container">
-      <h2>Welcome, {member?.fullName || user?.username || "Member"}</h2>
+      <h2>
+        Welcome,{" "}
+        {member?.fullName || user?.fullName || user?.username || "Member"}
+      </h2>
 
       <section className="summary-cards">
         <div className="card">
           <h3>Membership</h3>
           <p>
-            Status: <strong>{member?.membershipStatus ?? "—"}</strong>
+            Status: <strong>{membershipValid ? "Active" : "Expired"}</strong>
           </p>
           <p>
             Valid Until:{" "}

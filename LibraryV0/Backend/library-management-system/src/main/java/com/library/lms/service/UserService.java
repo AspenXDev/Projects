@@ -8,30 +8,25 @@ import java.util.Optional;
 
 public interface UserService {
 
-    // Create (hashes password)
     User createUser(User user);
 
-    // Existence checks
-    boolean existsByUsername(String username);
-    boolean existsByEmail(String email);
+    Optional<User> getUserById(Integer userId);
 
-    // Getters
-    User getUserById(Integer userId);
-    User getUserByUsername(String username);
-    User getUserByEmail(String email);
+    Optional<User> getUserByUsername(String username);
+
+    Optional<User> getUserByEmail(String email);
+
     List<User> getAllUsers();
 
-    // Update / Delete
     User updateUser(Integer userId, User user);
+
     void deleteUser(Integer userId);
 
-    // Auth
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
+
     User authenticate(String username, String password);
 
-    // Roles
     Role getRoleByName(String roleName);
-
-    // Kept for compatibility with existing callers
-    User saveUser(User user);
-    Optional<User> findByUsername(String username);
 }

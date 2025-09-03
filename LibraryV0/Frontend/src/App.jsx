@@ -7,6 +7,7 @@ import { RegisterPage } from "./components/auth/RegisterPage.jsx";
 import { MemberDashboard } from "./pages/MemberDashboard.jsx";
 import { LibrarianDashboard } from "./pages/LibrarianDashboard.jsx";
 import { Books } from "./pages/Books.jsx";
+import { BookManagement } from "./pages/BookManagement.jsx";
 import { PrivateRoute } from "./components/PrivateRoute.jsx";
 import { Layout } from "./components/Layout.jsx";
 
@@ -58,6 +59,17 @@ export default function App() {
           <PrivateRoute roles={["librarian"]}>
             <Layout>
               <LibrarianDashboard />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/books/manage"
+        element={
+          <PrivateRoute roles={["librarian"]}>
+            <Layout>
+              <BookManagement />
             </Layout>
           </PrivateRoute>
         }

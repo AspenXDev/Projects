@@ -5,7 +5,10 @@ import com.library.lms.dto.AuthRequest;
 import com.library.lms.dto.AuthResponse;
 import com.library.lms.dto.RegistrationRequest;
 import com.library.lms.model.Member;
+import com.library.lms.model.Librarian;
+import com.library.lms.model.Role;
 import com.library.lms.model.User;
+import com.library.lms.service.LibrarianService;
 import com.library.lms.service.MemberService;
 import com.library.lms.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/auth")
@@ -23,30 +26,49 @@ public class AuthController {
 
     private final UserService userService;
     private final MemberService memberService;
+    private final LibrarianService librarianService;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     public AuthController(UserService userService,
                           MemberService memberService,
+                          LibrarianService librarianService,
                           JwtTokenProvider jwtTokenProvider) {
         this.userService = userService;
         this.memberService = memberService;
+        this.librarianService = librarianService;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    // ======================
-    // Registration
-    // ======================
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegistrationRequest request) {
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+        if (request == null
+                || !StringUtils.hasText(request.getUsername())
+                || !StringUtils.hasText(request.getPassword())) {
+            return ResponseEntity.badRequest().body(new AuthResponse("username and password required"));
+        }
 
-        // Basic validation
+        try {
+            User user = userService.authenticate(request.getUsername(), request.getPassword())
+                    .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+
+            String fullName = deriveFullNameForUser(user);
+            String token = jwtTokenProvider.generateToken(user);
+
+            return ResponseEntity.ok(new AuthResponse(user, fullName, token));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(ex.getMessage()));
+        }
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@RequestBody RegistrationRequest request) {
         if (request == null
                 || !StringUtils.hasText(request.getUsername())
                 || !StringUtils.hasText(request.getEmail())
                 || !StringUtils.hasText(request.getPassword())
                 || !StringUtils.hasText(request.getFullName())) {
-            return ResponseEntity.badRequest().body(new AuthResponse("username, email, password, and fullName are required"));
+            return ResponseEntity.badRequest().body(new AuthResponse("username, email, password, fullName are required"));
         }
 
         if (userService.existsByUsername(request.getUsername())) {
@@ -56,67 +78,64 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new AuthResponse("Email already exists"));
         }
 
-        // Create User (role = Members, isActive = true)
+        Role membersRole = userService.getRoleByName("Members")
+                .orElseThrow(() -> new RuntimeException("Server misconfigured: Members role not found"));
+
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPasswordHash(request.getPassword()); // service will encode
-        user.setRole(userService.getRoleByName("Members"));
+        user.setPasswordHash(request.getPassword());
+        user.setRole(membersRole);
         user.setIsActive(true);
 
-        user = userService.createUser(user); // hashes & saves
+        User createdUser = userService.createUser(user);
 
-        // Create linked Member
         Member member = new Member();
+        member.setUser(createdUser);
         member.setFullName(request.getFullName());
-        memberService.createMember(member, user);
+        member.setRegistrationDate(LocalDate.now());
+        member.setMembershipValidUntil(LocalDate.now().plusYears(1));
+        member.setMembershipStatus(Member.MembershipStatus.Active);
 
-        // JWT
-        String token = jwtTokenProvider.generateToken(user);
+        memberService.createMember(member, createdUser);
 
+        String token = jwtTokenProvider.generateToken(createdUser);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new AuthResponse(user, token));
+                .body(new AuthResponse(createdUser, member.getFullName(), token));
     }
 
-    // ======================
-    // Login
-    // ======================
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
-        if (authRequest == null
-                || !StringUtils.hasText(authRequest.getUsername())
-                || !StringUtils.hasText(authRequest.getPassword())) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "username and password are required"
-            ));
-        }
-
-        try {
-            User user = userService.authenticate(authRequest.getUsername(), authRequest.getPassword());
-            String token = jwtTokenProvider.generateToken(user);
-            return ResponseEntity.ok(new AuthResponse(user, token));
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-                    "error", "Invalid credentials"
-            ));
-        }
-    }
-
-    // ======================
-    // Current user
-    // ======================
     @GetMapping("/me")
-    public ResponseEntity<?> me(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<AuthResponse> me(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Missing token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse("Missing token"));
         }
         String token = authHeader.substring("Bearer ".length());
         String username = jwtTokenProvider.getUsernameFromToken(token);
-        if (!StringUtils.hasText(username)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid token"));
-        }
 
-        User user = userService.getUserByUsername(username);
-        return ResponseEntity.ok(user);
+        User user = userService.getUserByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+
+        String fullName = deriveFullNameForUser(user);
+        return ResponseEntity.ok(new AuthResponse(user, fullName, token));
+    }
+
+    private String deriveFullNameForUser(User user) {
+        if (user == null || user.getRole() == null) return null;
+        String roleName = user.getRole().getRoleName();
+        if (roleName == null) return null;
+
+        try {
+            if ("Members".equalsIgnoreCase(roleName)) {
+                Member m = memberService.getMemberByUserId(user.getUserId())
+                        .orElseThrow(() -> new RuntimeException("Member not found"));
+                return m.getFullName();
+            } else if ("Librarians".equalsIgnoreCase(roleName)) {
+                Librarian l = librarianService.getLibrarianByUserId(user.getUserId())
+                        .orElseThrow(() -> new RuntimeException("Librarian not found"));
+                return l.getFullName();
+            }
+        } catch (Exception ignored) { }
+        return null;
     }
 }

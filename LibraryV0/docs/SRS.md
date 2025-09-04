@@ -48,106 +48,34 @@ Security is enforced **client-side** (route guard) and **server-side** (JWT vali
 - **FR-A9**: User passwords are stored using the BCrypt hashing algorithm.
 - **FR-A10**: JWTs are signed with a secret key of at least 256 bits to ensure cryptographic security.
 
-User Client (React) Backend (Spring Boot) Database (MySQL)
-| | | |
-|-- Register User Client (React) Backend (Spring Boot) Database (MySQL)
-| | | |
-|-- Register ----------->| | |
-| |-- POST /api/auth/register ------->|-- INSERT user ------------>|
-| | |<- success ----------------|
-| |<- Registration successful --------| |
-| | | |
-|-- Login -------------->| | |
-| |-- POST /api/auth/login ---------->|-- SELECT user ------------>|
-| | |-- BCrypt password check -->|
-| | |<- JWT (signed, 256-bit) ---|
-| |<- JWT received -------------------| |
-| |-- Store JWT in localStorage ------| |
-| | | |
-|-- Access protected ---->| | |
-| route (/dashboard) | | |
-| |-- Axios attaches JWT ------------>|-- @PreAuthorize check ----|
-| | |-- Verify JWT signature --->|
-| | |<- Authorized --------------|
-| |<- Protected data -----------------| |
-| | | |
-|-- Access public ------>| | |
-| route (/books) |-- GET /api/books ---------------->|-- permitAll() ------------>|
-| | |<- Books list --------------|
-| |<- Books shown -------------------| |
-User Client (React) Backend (Spring Boot) Database (MySQL)
-| | | |
-|-- Register ----------->| | |
-| |-- POST /api/auth/register ------->|-- INSERT user ------------>|
-| | |<- success ----------------|
-| |<- Registration successful --------| |
-| | | |
-|-- Login -------------->| | |
-| |-- POST /api/auth/login ---------->|-- SELECT user ------------>|
-| | |-- BCrypt password check -->|
-| | |<- JWT (signed, 256-bit) ---|
-| |<- JWT received -------------------| |
-| |-- Store JWT in localStorage ------| |
-| | | |
-|-- Access protected ---->| | |
-| route (/dashboard) | | |
-| |-- Axios attaches JWT ------------>|-- @PreAuthorize check ----|
-| | |-- Verify JWT signature --->|
-| | |<- Authorized --------------|
-| |<- Protected data -----------------| |
-| | | |
-|-- Access public ------>| | |
-| route (/books) |-- GET /api/books ---------------->|-- permitAll() ------------>|
-| | |<- Books list --------------|
-| |<- Books shown -------------------| |
------------>| | |
-| |-- POST /api/auth/register ------->|-- INSERT user ------------>|
-| | |<- success ----------------|
-| |<- Registration successful --------| |
-| | | |
-|-- Login -------------->| | |
-| |-- POST /api/auth/login ---------->|-- SELECT user ------------>|
-| | |-- BCrypt password check -->|
-| | |<- JWT (signed, 256-bit) ---|
-| |<- JWT received -------------------| |
-| |-- Store JWT in localStorage ------| |
-| | | |
-|-- Access protected ---->| | |
-| route (/dashboard) | | |
-| |-- Axios attaches JWT ------------>|-- @PreAuthorize check ----|
-| | |-- Verify JWT signature --->|
-| | |<- Authorized --------------|
-| |<- Protected data -----------------| |
-| | | |
-|-- Access public ------>| | |
-| route (/books) |-- GET /api/books ---------------->|-- permitAll() ------------>|
-| | |<- Books list --------------|
-| |<- Books shown -------------------| |
-User Client (React) Backend (Spring Boot) Database (MySQL)
-| | | |
-|-- Register ----------->| | |
-| |-- POST /api/auth/register ------->|-- INSERT user ------------>|
-| | |<- success ----------------|
-| |<- Registration successful --------| |
-| | | |
-|-- Login -------------->| | |
-| |-- POST /api/auth/login ---------->|-- SELECT user ------------>|
-| | |-- BCrypt password check -->|
-| | |<- JWT (signed, 256-bit) ---|
-| |<- JWT received -------------------| |
-| |-- Store JWT in localStorage ------| |
-| | | |
-|-- Access protected ---->| | |
-| route (/dashboard) | | |
-| |-- Axios attaches JWT ------------>|-- @PreAuthorize check ----|
-| | |-- Verify JWT signature --->|
-| | |<- Authorized --------------|
-| |<- Protected data -----------------| |
-| | | |
-|-- Access public ------>| | |
-| route (/books) |-- GET /api/books ---------------->|-- permitAll() ------------>|
-| | |<- Books list --------------|
-| |<- Books shown -------------------| |
+#### 3.1.1 Auth Flow Chart
+
+User                Client (React)                 Backend (Spring Boot)          Database (MySQL)
+ |                        |                                   |                           |
+ |-- Register ----------->|                                   |                           |
+ |                        |-- POST /api/auth/register ------->|-- INSERT user ----------->|
+ |                        |                                   |<- success ----------------|
+ |                        |<- Registration successful --------|                           |
+ |                        |                                   |                           |
+ |-- Login -------------->|                                   |                           |
+ |                        |-- POST /api/auth/login ---------->|-- SELECT user ----------->|
+ |                        |                                   |-- BCrypt password check-->|
+ |                        |                                   |<- JWT (signed, 256-bit)---|
+ |                        |<- JWT received -------------------|                           |
+ |                        |-- Store JWT in localStorage ------|                           |
+ |                        |                                   |                           |
+ |-- Access protected --->|                                   |                           |
+ |   route (/dashboard)   |                                   |                           |
+ |                        |-- Axios attaches JWT ------------>|-- Verify JWT signature--->|
+ |                        |                                   |-- @PreAuthorize check ----|
+ |                        |                                   |-- hasRole('LIBRARIAN') -->|
+ |                        |                                   |<- Authorized -------------|
+ |                        |                                   |                           |
+ |                        | <- Protected data ----------------|                           |
+ |-- Access public ------>|                                   |                           |
+ |   route (/books)       |-- GET /books ----------====------>|-- permitAll() ----------->|
+ |                        |                                   |<- Books list -------------|
+ |                        |<- Books shown --------------------|                           |
 
 ### 3.2 Membership Management (Validity)
 
@@ -273,7 +201,7 @@ Member sees complete list of active loans with all relevant information.
 **Implementation:**
 LoanService backend logic; (no database triggers in MVP)
 
-**Process:**
+**Process:**\
 On loan creation: decrement available_copies.
 On loan return: increment available_copies.
 

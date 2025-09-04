@@ -37,11 +37,117 @@ Security is enforced **client-side** (route guard) and **server-side** (JWT vali
 
 ### 3.1 Authentication & Authorization
 
-- **FR-A1**: Users register as Member or Librarian.
-- **FR-A2**: Users log in with email/username + password.
-- **FR-A3**: System issues JWT on successful login; validates JWT on protected endpoints.
-- **FR-A4**: Client restricts access via `PrivateRoute` based on role.
-- **FR-A5**: Passwords stored using strong hashing (e.g., BCrypt).
+- **FR-A1**: Users can register as a Member.
+- **FR-A2**: Users can log in with username and password.
+- **FR-A3**: On successful login, the Backend issues a JWT.
+- **FR-A4**: The Client stores the JWT securely in `localStorage`.
+- **FR-A5**: An Axios interceptor automatically attaches the JWT to all protected API requests.
+- **FR-A6**: The Client restricts navigation using `PrivateRoute`, checking for valid JWT and user role.
+- **FR-A7**: The Backend enforces server-side role-based access control (RBAC) using `@PreAuthorize` annotations.
+- **FR-A8**: Public endpoints (e.g., `GET /books`) are explicitly permitted using Spring Security’s `permitAll()`.
+- **FR-A9**: User passwords are stored using the BCrypt hashing algorithm.
+- **FR-A10**: JWTs are signed with a secret key of at least 256 bits to ensure cryptographic security.
+
+User Client (React) Backend (Spring Boot) Database (MySQL)
+| | | |
+|-- Register User Client (React) Backend (Spring Boot) Database (MySQL)
+| | | |
+|-- Register ----------->| | |
+| |-- POST /api/auth/register ------->|-- INSERT user ------------>|
+| | |<- success ----------------|
+| |<- Registration successful --------| |
+| | | |
+|-- Login -------------->| | |
+| |-- POST /api/auth/login ---------->|-- SELECT user ------------>|
+| | |-- BCrypt password check -->|
+| | |<- JWT (signed, 256-bit) ---|
+| |<- JWT received -------------------| |
+| |-- Store JWT in localStorage ------| |
+| | | |
+|-- Access protected ---->| | |
+| route (/dashboard) | | |
+| |-- Axios attaches JWT ------------>|-- @PreAuthorize check ----|
+| | |-- Verify JWT signature --->|
+| | |<- Authorized --------------|
+| |<- Protected data -----------------| |
+| | | |
+|-- Access public ------>| | |
+| route (/books) |-- GET /api/books ---------------->|-- permitAll() ------------>|
+| | |<- Books list --------------|
+| |<- Books shown -------------------| |
+User Client (React) Backend (Spring Boot) Database (MySQL)
+| | | |
+|-- Register ----------->| | |
+| |-- POST /api/auth/register ------->|-- INSERT user ------------>|
+| | |<- success ----------------|
+| |<- Registration successful --------| |
+| | | |
+|-- Login -------------->| | |
+| |-- POST /api/auth/login ---------->|-- SELECT user ------------>|
+| | |-- BCrypt password check -->|
+| | |<- JWT (signed, 256-bit) ---|
+| |<- JWT received -------------------| |
+| |-- Store JWT in localStorage ------| |
+| | | |
+|-- Access protected ---->| | |
+| route (/dashboard) | | |
+| |-- Axios attaches JWT ------------>|-- @PreAuthorize check ----|
+| | |-- Verify JWT signature --->|
+| | |<- Authorized --------------|
+| |<- Protected data -----------------| |
+| | | |
+|-- Access public ------>| | |
+| route (/books) |-- GET /api/books ---------------->|-- permitAll() ------------>|
+| | |<- Books list --------------|
+| |<- Books shown -------------------| |
+----------->| | |
+| |-- POST /api/auth/register ------->|-- INSERT user ------------>|
+| | |<- success ----------------|
+| |<- Registration successful --------| |
+| | | |
+|-- Login -------------->| | |
+| |-- POST /api/auth/login ---------->|-- SELECT user ------------>|
+| | |-- BCrypt password check -->|
+| | |<- JWT (signed, 256-bit) ---|
+| |<- JWT received -------------------| |
+| |-- Store JWT in localStorage ------| |
+| | | |
+|-- Access protected ---->| | |
+| route (/dashboard) | | |
+| |-- Axios attaches JWT ------------>|-- @PreAuthorize check ----|
+| | |-- Verify JWT signature --->|
+| | |<- Authorized --------------|
+| |<- Protected data -----------------| |
+| | | |
+|-- Access public ------>| | |
+| route (/books) |-- GET /api/books ---------------->|-- permitAll() ------------>|
+| | |<- Books list --------------|
+| |<- Books shown -------------------| |
+User Client (React) Backend (Spring Boot) Database (MySQL)
+| | | |
+|-- Register ----------->| | |
+| |-- POST /api/auth/register ------->|-- INSERT user ------------>|
+| | |<- success ----------------|
+| |<- Registration successful --------| |
+| | | |
+|-- Login -------------->| | |
+| |-- POST /api/auth/login ---------->|-- SELECT user ------------>|
+| | |-- BCrypt password check -->|
+| | |<- JWT (signed, 256-bit) ---|
+| |<- JWT received -------------------| |
+| |-- Store JWT in localStorage ------| |
+| | | |
+|-- Access protected ---->| | |
+| route (/dashboard) | | |
+| |-- Axios attaches JWT ------------>|-- @PreAuthorize check ----|
+| | |-- Verify JWT signature --->|
+| | |<- Authorized --------------|
+| |<- Protected data -----------------| |
+| | | |
+|-- Access public ------>| | |
+| route (/books) |-- GET /api/books ---------------->|-- permitAll() ------------>|
+| | |<- Books list --------------|
+| |<- Books shown -------------------| |
 
 ### 3.2 Membership Management (Validity)
 
@@ -52,11 +158,11 @@ Security is enforced **client-side** (route guard) and **server-side** (JWT vali
 
 ### 3.3 Book Catalog
 
-- **FR-C1**: Search books by one or more criteria.
-- **FR-C2**: View book details.
+- **FR-C1**: Public non-authenticated users may view and search books by one or more criteria.
+- **FR-C2**: Members and Librarians can view further book details.
 - **FR-C3 (Librarian)**: Add new books.
 - **FR-C4 (Librarian)**: Edit book details.
-- **FR-C5 (Librarian)**: Remove/archive books (excluded from member search).
+- **FR-C5 (Librarian)**: Remove books.
 
 ### 3.4 Borrowing
 
@@ -174,7 +280,7 @@ On loan return: increment available_copies.
 **Outcome:**
 available_copies always reflects actual available books.
 
-### 3.5 Reservations
+### 3.5 Reservations (Hold/Reservation feature not in MVP. For future version)
 
 #### FR-R1: Place Reservation (Member)
 
@@ -192,7 +298,7 @@ System checks eligibility and creates a new row in reservations with status = 'W
 **Outcome:**
 Member is added to the reservation queue for the book.
 
-#### FR-R2: Notify & Hold Book
+#### FR-R2: Notify & Hold Book (Notification feature not in MVP. For future version)
 
 **Process:**
 When a book’s available_copies > 0 and reservation queue exists, system sets the first reservation’s status = 'On Hold' and hold_until = now() + 3 days.

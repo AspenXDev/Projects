@@ -19,18 +19,17 @@ This MVP follows the instructor’s 40-hour milestone plan; deployment is **not 
 
 - **Members** (library patrons)
 - **Librarians** (catalog & circulation)
-- **Instructor/Training Provider** (review & acceptance)
+- **Public Users** (browse books and register to become members if interested)
 
 ## 4. Scope
 
 ### In Scope (MVP)
 
 - Registration & login (Members, Librarians) with role-based access.
-- Book catalog: add/edit/remove (Librarian), search & view (Member/Librarian).
+- Book catalog: add/edit/remove (Librarian), search (Public) & view (Member/Librarian).
 - Lending: borrow, return, renew (with rules enforcement).
-- Reservations: FIFO queue & 3-day hold.
-- Overdue detection & **on-screen** notifications.
-- Fine calculation and display (no online payments).
+- Overdue detection and dashboard display.
+- Fine calculation and and dashboard display (no online payments).
 - **Membership validity management**: 1-year validity from registration; borrowing blocked if expired; Librarian can extend/mark active.
 
 ### Out of Scope (MVP)
@@ -66,7 +65,7 @@ This MVP follows the instructor’s 40-hour milestone plan; deployment is **not 
 
 - **Timeline**: 40 hours total (6 milestones).
 - **Roles**: exactly **two** (Member, Librarian).
-- **Tech**: Spring Boot (Java), React, MySQL.
+- **Tech**: Spring Boot (Java), ReactJS, MySQL.
 - **Language**: English only.
 - **Environment**: local/demo; deployment not required.
 
@@ -82,14 +81,14 @@ This MVP follows the instructor’s 40-hour milestone plan; deployment is **not 
 2. User Registration & Authentication (6h)
 3. Book Management (Librarian) (8h)
 4. Book Search & Borrow/Return (10h)
-5. Overdue Notifications (4h)
+5. Overdue Notifications (4h) <- Removed from MVP
 6. Integration, Testing & Final Documentation (8h)
 
 ## 9. Acceptance Criteria
 
 - All core features above implemented and functional with rules enforced (incl. membership validity, loan limits, renewals, fines).
 - Code follows standards; basic tests; proper error handling; no critical bugs.
-- Completed documentation (BRD, SRS, System Design, Test Plan & cases, User Manual, PPT).
+- Completed documentation (BRD, SRS, System Design, User Manual, PPT).
 
 ## 10. Deliverables
 

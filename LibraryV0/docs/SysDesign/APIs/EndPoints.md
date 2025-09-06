@@ -1,4 +1,3 @@
----
 # EndPoints
 
 ## 1. Legend
@@ -12,8 +11,8 @@
 
 **Frontend Guarding:**
 
-- `PrivateRoute` components and conditional rendering to restrict access based on role.
-- Members can see their own profile pages and dashboards.
+- `PrivateRoute` components and conditional rendering restrict access based on role.
+- Members can see only their own profile pages and dashboards.
 - Librarians can access all management/admin panels.
 
 **Backend RBAC:**
@@ -114,44 +113,14 @@
 
 ---
 
-## 8. Role Enforcement Matrix (Visual)
+## 08. Role Enforcement Matrix
 
-| Entity       | Members (own)                | Librarians              |
-| ------------ | ---------------------------- | ----------------------- |
-| Profile      | view/edit own                | view/edit any           |
-| Books        | view                         | CRUD including location |
-| Loans        | view/create/return/renew own | full CRUD               |
-| Reservations | view/create/cancel own       | full CRUD               |
-| Fines        | view own                     | view all                |
-| Auth         | login/register/reset own     | manage if needed        |
-
----
-
-## 9. Notes for Frontend & Backend
-
-**Frontend**
-
-- Use `PrivateRoute` to hide unauthorized pages.
-- Members see only their own dashboards.
-- Librarians see global management dashboards.
-
-**Backend**
-
-- Use `@PreAuthorize` for role checks.
-- All endpoints require JWT except `/auth/**`.
-- JWT payload contains `username` and `role_name`.
-
----
-
-## 10. Role Enforcement Matrix
-
-| Entity / Action | Members (own)                      | Librarians               |
-| --------------- | ---------------------------------- | ------------------------ |
-| Profile         | view / edit own                    | view / edit any          |
-| Books           | view                               | create / update / delete |
-| Loans           | view / borrow / return / renew own | full CRUD                |
-| Reservations    | view / create / cancel own         | full CRUD                |
-| Fines           | view own                           | full CRUD                |
-| Auth            | login / register / reset own       | full CRUD                |
+| Entity / Action | Members (own)    | Librarians               |
+| --------------- | ---------------- | ------------------------ |
+| Books           | view             | create / update / delete |
+| Members         | view / edit own  | view / edit any          |
+| Loans           | view             | full CRUD                |
+| Fines           | view own         | full CRUD                |
+| Auth            | login / register | full CRUD                |
 
 ---

@@ -1,4 +1,4 @@
-// PATH: src/App.css
+// PATH: src/App.jsx
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage.jsx";

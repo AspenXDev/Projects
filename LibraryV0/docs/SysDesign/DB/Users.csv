@@ -1,0 +1,11 @@
+user_id,username,email,password_hash,role_id,is_active,created_at,updated_at
+1,victor_chan,victor@example.com,$2a$10$0Ql2SXZ5eNfUUuFEmZMF9OYLVZBNoTd50iz8OyaAXniDba39RNkdW,1,1,"2025-09-03 17:09:49","2025-09-03 17:09:49"
+2,alice_walker,alice@example.com,$2a$10$0Ql2SXZ5eNfUUuFEmZMF9OYLVZBNoTd50iz8OyaAXniDba39RNkdW,1,1,"2025-09-03 17:09:49","2025-09-03 17:09:49"
+3,bob_smith,bob@example.com,$2a$10$0Ql2SXZ5eNfUUuFEmZMF9OYLVZBNoTd50iz8OyaAXniDba39RNkdW,1,1,"2025-09-03 17:09:49","2025-09-03 17:09:49"
+4,charlie_liu,charlie@example.com,$2a$10$0Ql2SXZ5eNfUUuFEmZMF9OYLVZBNoTd50iz8OyaAXniDba39RNkdW,1,1,"2025-09-03 17:09:49","2025-09-03 17:09:49"
+5,diana_king,diana@example.com,$2a$10$0Ql2SXZ5eNfUUuFEmZMF9OYLVZBNoTd50iz8OyaAXniDba39RNkdW,1,1,"2025-09-03 17:09:49","2025-09-03 17:09:49"
+6,librarian_john,john@example.com,$2a$10$0Ql2SXZ5eNfUUuFEmZMF9OYLVZBNoTd50iz8OyaAXniDba39RNkdW,2,1,"2025-09-03 17:09:49","2025-09-03 17:09:49"
+7,librarian_mary,mary@example.com,$2a$10$0Ql2SXZ5eNfUUuFEmZMF9OYLVZBNoTd50iz8OyaAXniDba39RNkdW,2,1,"2025-09-03 17:09:49","2025-09-03 17:09:49"
+8,librarian_max,max@example.com,$2a$10$0Ql2SXZ5eNfUUuFEmZMF9OYLVZBNoTd50iz8OyaAXniDba39RNkdW,2,1,"2025-09-03 17:09:49","2025-09-03 17:09:49"
+9,librarian_emma,emma@example.com,$2a$10$0Ql2SXZ5eNfUUuFEmZMF9OYLVZBNoTd50iz8OyaAXniDba39RNkdW,2,1,"2025-09-03 17:09:49","2025-09-03 17:09:49"
+10,Sun_Wukong,Sun@Wukong.com,$2a$10$3ek7Job/XVcC5b0nso6N4OpxSUsd4CMnhnLGxcQGsMPTIs5iO07GS,1,1,"2025-09-05 14:44:52","2025-09-05 14:44:52"

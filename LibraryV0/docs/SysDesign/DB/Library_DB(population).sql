@@ -106,3 +106,34 @@ INSERT IGNORE INTO loans (member_id, book_id, loan_date, due_date, return_date, 
 (3, 9, '2025-08-01', '2025-08-10', NULL, 0, 'Active'), -- example overdue for Bob Smith
 (1, 4, '2025-07-01', '2025-07-15', '2025-07-14', 0, 'Returned'),
 (2, 3, '2025-06-20', '2025-07-04', '2025-07-02', 0, 'Returned');
+
+-- =================
+-- LOANS (refreshed)
+-- =================
+INSERT IGNORE INTO loans (member_id, book_id, loan_date, due_date, return_date, renew_count, status) VALUES
+-- Victor Chan: 3 loans, 2 overdue
+(1, 1, '2025-08-10', '2025-08-24', NULL, 0, 'Active'), -- overdue
+(1, 2, '2025-08-12', '2025-08-26', NULL, 0, 'Active'), -- overdue
+(1, 8, '2025-08-25', '2025-09-08', NULL, 0, 'Active'), -- active, not overdue yet
+
+-- Alice Walker: 2 loans, 1 returned, 1 active
+(2, 6, '2025-08-15', '2025-08-29', NULL, 0, 'Active'),
+(2, 3, '2025-08-16', '2025-08-30', '2025-08-28', 0, 'Returned'),
+
+-- Bob Smith: 1 overdue loan
+(3, 9, '2025-08-18', '2025-09-01', NULL, 0, 'Active'),
+
+-- Charlie Liu: no loans yet (new member)
+-- Diana King: 1 active loan
+(5, 14, '2025-08-28', '2025-09-11', NULL, 0, 'Active');
+
+-- =================
+-- FINES (for overdue loans)
+-- =================
+INSERT IGNORE INTO fines (loan_id, amount, paid, created_at, updated_at) VALUES
+-- Victor Chan's overdue loans
+(1, 0.50, FALSE, '2025-08-25 10:00:00', '2025-08-25 10:00:00'),
+(2, 0.75, FALSE, '2025-08-27 10:00:00', '2025-08-27 10:00:00'),
+
+-- Bob Smith's overdue loan
+(3, 0.60, FALSE, '2025-09-02 10:00:00', '2025-09-02 10:00:00');

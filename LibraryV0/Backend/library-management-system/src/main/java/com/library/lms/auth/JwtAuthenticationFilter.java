@@ -110,7 +110,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * Normalizes DB role names like "Librarians" or "Members" into Spring Security format.
-     * Example: "Librarians" -> "ROLE_LIBRARIAN"
+     * "Librarians" -> "ROLE_LIBRARIAN"
      */
     private String mapRole(String roleClaim) {
         if (roleClaim == null) return null;

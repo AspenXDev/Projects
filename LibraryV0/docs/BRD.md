@@ -7,7 +7,7 @@ The Library Management System (LMS) is an MVP web application to streamline core
 - **Member** — search, borrow, renew, return, reserve; view history and fines.
 - **Librarian** — all Member capabilities plus catalog/loan administration and membership management.
 
-This MVP follows the instructor’s 40-hour milestone plan; deployment is **not required**.
+This MVP follows the training provider's 6-milestones plan; deployment is **not required**.
 
 ## 2. Business Objectives
 
@@ -73,7 +73,7 @@ This MVP follows the instructor’s 40-hour milestone plan; deployment is **not 
 
 - Demo on a local machine or local network with sample data.
 - Single-branch library; printed materials only.
-- Librarians have basic computer literacy.
+- Users have basic computer literacy.
 
 ## 8. Milestones (per Instructor)
 
@@ -88,10 +88,11 @@ This MVP follows the instructor’s 40-hour milestone plan; deployment is **not 
 
 - All core features above implemented and functional with rules enforced (incl. membership validity, loan limits, renewals, fines).
 - Code follows standards; basic tests; proper error handling; no critical bugs.
-- Completed documentation (BRD, SRS, System Design, User Manual, PPT).
+- Completed documentation (BRD, SRS, System Design, User Manual).
 
 ## 10. Deliverables
 
 - Running application (local demo)
 - GitHub repository
 - Documentation: As above
+- Powerpoint presentation

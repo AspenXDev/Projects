@@ -1,4 +1,25 @@
+/**
+ * LibrarianDashboard component that displays a librarian's dashboard with
+ * sections for Books, Members, Loans, and Fines.
+ *
+ * The component:
+ * - Fetches data for books, members, loans, and fines from the respective API endpoints
+ *   on component mount using useEffect.
+ * - Provides CRUD helper functions (deleteBook, deleteMember, deleteLoan, deleteFine)
+ *   for deleting respective items and refreshing the displayed data.
+ * - Renders four grid sections, each containing cards with details and action buttons:
+ *   - Books: Displays title, author, and genre of each book.
+ *   - Members: Displays the member's name, join date, expiry date, and unpaid fines.
+ *   - Loans: Displays the book title, member name, due date, and status of each loan.
+ *   - Fines: Displays the member name associated with the fine, amount, reason, and paid status.
+ *
+ * @component
+ * @example
+ * // Usage:
+ * return <LibrarianDashboard />;
+ */
 // path: Frontend/src/pages/LibrarianDashboard.jsx
+
 import React, { useEffect, useState } from "react";
 import { api } from "../services/api";
 import "../styling/LandingPage.css"; // for same slim card/grid styling

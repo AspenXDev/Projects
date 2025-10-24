@@ -1,4 +1,39 @@
+/**
+ * LandingPage component represents the main page of the Library application.
+ *
+ * This component is responsible for:
+ * - Fetching the list of all books via the getAllBooks service call on mount.
+ * - Managing state for the complete book list, featured (new arrival) books, and search filters.
+ * - Initializing a featured books section using a fixed list of titles ("Pride and Prejudice",
+ *   "1984", "To Kill A Mockingbird") or defaulting to the first three books if none match.
+ * - Allowing users to filter books by title, author, ISBN, and category.
+ * - Rendering separate sections for featured books and all books.
+ *
+ * State Variables:
+ * @state {Array} books - The complete list of books fetched from the backend.
+ * @state {Array} featured - A subset of books designated as featured or new arrivals.
+ * @state {string} searchTitle - The search query for filtering books by title.
+ * @state {string} searchAuthor - The search query for filtering books by author.
+ * @state {string} searchISBN - The search query for filtering books by ISBN.
+ * @state {string} filterCategory - The selected category for filtering books.
+ *
+ * Filtering Logic:
+ * - Books are filtered by checking if they include the search strings for title, author, and ISBN.
+ * - The category filter is applied by comparing the lowercased category of the book with the selected filter.
+ *
+ * Rendering:
+ * - A header with a welcome message.
+ * - A search filter section with input fields for title, author, ISBN, and a dropdown for category.
+ * - A featured books section showcasing the new arrivals if available.
+ * - An all books section displaying the filtered list of books or a "No books found" message.
+ *
+ * @component
+ * @example
+ * // Example usage:
+ * // <LandingPage />
+ */
 // path: Frontend/src/pages/LandingPage.jsx
+
 import React, { useEffect, useState } from "react";
 import { getAllBooks } from "../services/BookService.js";
 import { BookCard } from "../components/books/BookCard.jsx";

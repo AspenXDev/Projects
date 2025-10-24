@@ -1,3 +1,21 @@
+/**
+ * CustomUserDetailsService handles user-specific data retrieval and authentication details.
+ * <p>
+ * This service is responsible for loading user details from the data source, which includes
+ * user roles and permissions. It integrates with Spring Security to facilitate custom
+ * authentication and authorization logic.
+ * </p>
+ *
+ * <p>
+ * Note: Inline comments within the service methods further explain the authentication
+ * process and specific handling of user data (e.g., loading user by username).
+ * </p>
+ *
+ * @author 
+ *   Victor Chan
+ * @version 1.0.0
+ * @see org.springframework.security.core.userdetails.UserDetailsService
+ */
 package com.library.lms.auth;
 
 import com.library.lms.model.User;

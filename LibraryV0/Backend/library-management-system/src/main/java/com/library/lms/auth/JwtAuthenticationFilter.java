@@ -1,3 +1,43 @@
+/**
+ * Filters incoming HTTP requests to apply JWT-based authentication.
+ * <p>
+ * This filter is executed once per request and functions as follows:
+ * <ul>
+ *   <li>
+ *     Checks the requested URL; if the URL begins with "/auth/", the filter bypasses JWT processing
+ *     (e.g., for login or registration endpoints).
+ *   </li>
+ *   <li>
+ *     Extracts the JWT token from the "Authorization" header in the format "Bearer {token}".
+ *   </li>
+ *   <li>
+ *     Uses the JwtTokenProvider to obtain the username from the token.
+ *   </li>
+ *   <li>
+ *     Loads user details via the injected UserDetailsService and retrieves the "role" claim from the token.
+ *   </li>
+ *   <li>
+ *     Normalizes the extracted role (such as converting "Librarians" to "ROLE_LIBRARIAN") by stripping a 
+ *     trailing 's' if present and converting to uppercase.
+ *   </li>
+ *   <li>
+ *     If a valid role is obtained, an authentication token (UsernamePasswordAuthenticationToken) is created,
+ *     including the mapped authority, and set into the Spring Security Context.
+ *   </li>
+ *   <li>
+ *     In case of any failures (no token found, invalid token, or exception during JWT processing), the error is logged
+ *     and the filter chain continues.
+ *   </li>
+ * </ul>
+ * </p>
+ *
+ * @see org.springframework.web.filter.OncePerRequestFilter
+ * @see jakarta.servlet.http.HttpServletRequest
+ * @see jakarta.servlet.http.HttpServletResponse
+ * @see org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+ * @see org.springframework.security.core.context.SecurityContextHolder
+ * @since 1.0
+ */
 // PATH: src/main/java/com/library/lms/auth/JwtAuthenticationFilter.java
 package com.library.lms.auth;
 

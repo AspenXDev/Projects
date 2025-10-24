@@ -23,4 +23,13 @@ jobs:
           java-version: '11'
 
       - name: Run Security Scan
-        # Add the command or action to run your scan here
+        run: |
+          curl -LO https://github.com/jeremylong/DependencyCheck/releases/download/v6.5.3/dependency-check-6.5.3-release.zip
+          unzip dependency-check-6.5.3-release.zip
+          ./dependency-check/bin/dependency-check.sh --project JavaSecurityCheck --scan ./ --format HTML --out report --disableAssembly -v
+
+      - name: Upload Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-report
+          path: report
